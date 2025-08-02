@@ -1,0 +1,2157 @@
+                                <span style="color: var(--success-color); font-weight: 600;" id="previewRaised">₹0 raised</span>
+                                <span style="color: #666;" id="previewGoal">of ₹0 goal</span>
+                                <span style="color: var(--secondary-color); font-weight: 600;" id="previewDonors">0 donors</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <button class="btn-social btn-facebook" onclick="shareSelectedCampaign('facebook')">📘 Share on Facebook</button>
+                            <button class="btn-social btn-twitter" onclick="shareSelectedCampaign('twitter')">🐦 Share on Twitter</button>
+                            <button class="btn-social btn-whatsapp" onclick="shareSelectedCampaign('whatsapp')">💬 Share on WhatsApp</button>
+                            <button class="btn btn-outline" onclick="copyShareLink()">🔗 Copy Link</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Updates Page -->
+        <div id="updatesPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Campaign Updates</h1>
+                    <p class="page-subtitle">Keep your supporters informed with regular campaign updates</p>
+                </div>
+
+                <!-- Update Composer -->
+                <div class="updates-section">
+                    <h2 style="margin-bottom: 1.5rem; color: var(--dark-color);">Post New Update</h2>
+                    
+                    <div class="update-composer">
+                        <form onsubmit="postUpdate(event)">
+                            <div class="form-group">
+                                <label for="updateCampaign">Select Campaign</label>
+                                <select id="updateCampaign" class="form-control" required>
+                                    <option value="">Choose campaign...</option>
+                                    <option value="1">Help Rahul Fight Cancer</option>
+                                    <option value="2">Education for Rural Children</option>
+                                    <option value="3">Flood Relief Kerala</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateTitle">Update Title</label>
+                                <input type="text" id="updateTitle" class="form-control" placeholder="Enter update title..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updateContent">Update Content</label>
+                                <div class="rich-editor">
+                                    <div class="editor-toolbar">
+                                        <button type="button" class="editor-btn" onclick="formatText('bold')" title="Bold"><b>B</b></button>
+                                        <button type="button" class="editor-btn" onclick="formatText('italic')" title="Italic"><i>I</i></button>
+                                        <button type="button" class="editor-btn" onclick="formatText('underline')" title="Underline"><u>U</u></button>
+                                        <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')" title="Numbered List">1.</button>
+                                        <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">•</button>
+                                    </div>
+                                    <div class="editor-content" id="updateContent" contenteditable="true" placeholder="Share your progress, milestones, or important news with your supporters..."></div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem;">
+                                <label>
+                                    <input type="checkbox" id="notifyDonors" checked>
+                                    <span style="margin-left: 0.5rem;">Notify all donors via email</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="shareOnSocial">
+                                    <span style="margin-left: 0.5rem;">Share on social media</span>
+                                </label>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button type="submit" class="btn btn-primary">📢 Post Update</button>
+                                <button type="button" class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Recent Updates -->
+                    <div class="updates-feed">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--dark-color);">Recent Updates</h3>
+                        <div id="updatesList">
+                            <!-- Sample updates -->
+                            <div class="update-item">
+                                <div class="update-header">
+                                    <div>
+                                        <h4 style="color: var(--dark-color); margin-bottom: 0.25rem;">Great Progress on Treatment</h4>
+                                        <div class="update-meta">
+                                            <span>Help Rahul Fight Cancer</span>
+                                            <span>•</span>
+                                            <span>2 days ago</span>
+                                            <span>•</span>
+                                            <span>By Campaign Creator</span>
+                                        </div>
+                                    </div>
+                                    <div class="update-actions">
+                                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="editUpdate(1)">Edit</button>
+                                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="shareUpdate(1)">Share</button>
+                                    </div>
+                                </div>
+                                <div class="update-content">
+                                    <p>We're thrilled to share that Rahul has completed his first round of chemotherapy successfully! The doctors are optimistic about his progress. Thank you to everyone who has supported us so far.</p>
+                                </div>
+                                <div class="update-stats">
+                                    <span>👀 1,234 views</span>
+                                    <span>❤️ 89 reactions</span>
+                                    <span>💬 23 comments</span>
+                                    <span>📤 45 shares</span>
+                                </div>
+                            </div>
+
+                            <div class="update-item">
+                                <div class="update-header">
+                                    <div>
+                                        <h4 style="color: var(--dark-color); margin-bottom: 0.25rem;">Milestone Reached!</h4>
+                                        <div class="update-meta">
+                                            <span>Education for Rural Children</span>
+                                            <span>•</span>
+                                            <span>5 days ago</span>
+                                            <span>•</span>
+                                            <span>By NGO Shiksha</span>
+                                        </div>
+                                    </div>
+                                    <div class="update-actions">
+                                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="editUpdate(2)">Edit</button>
+                                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="shareUpdate(2)">Share</button>
+                                    </div>
+                                </div>
+                                <div class="update-content">
+                                    <p>Amazing news! We've reached 60% of our funding goal. Construction of the new classrooms has begun, and we expect to welcome our first students by next month. Your support is making dreams come true!</p>
+                                </div>
+                                <div class="update-stats">
+                                    <span>👀 856 views</span>
+                                    <span>❤️ 67 reactions</span>
+                                    <span>💬 15 comments</span>
+                                    <span>📤 32 shares</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communication Center Page -->
+        <div id="communicationPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Communication Center</h1>
+                    <p class="page-subtitle">Manage all your supporter communications from one place</p>
+                </div>
+
+                <!-- Communication Stats -->
+                <div class="communication-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📧</div>
+                        <div class="stat-value">2,450</div>
+                        <div class="stat-label">Emails Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📱</div>
+                        <div class="stat-value">1,890</div>
+                        <div class="stat-label">SMS Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-value">78.5%</div>
+                        <div class="stat-label">Open Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-value">23.4%</div>
+                        <div class="stat-label">Response Rate</div>
+                    </div>
+                </div>
+
+                <!-- Email Templates -->
+                <div class="email-templates">
+                    <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Email Templates</h2>
+                    
+                    <div class="template-grid">
+                        <div class="template-card">
+                            <div class="template-preview">📧</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Thank You Email</h3>
+                                <p class="template-description">Express gratitude to donors with a personalized thank you message</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('thankyou')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('thankyou')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-preview">📢</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Campaign Update</h3>
+                                <p class="template-description">Keep supporters informed about campaign progress and milestones</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('update')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('update')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-preview">🎉</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Goal Achieved</h3>
+                                <p class="template-description">Celebrate reaching funding goals with your supporters</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('celebration')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('celebration')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-preview">⏰</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Urgency Appeal</h3>
+                                <p class="template-description">Create urgency for time-sensitive campaigns</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('urgency')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('urgency')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-preview">📋</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Monthly Report</h3>
+                                <p class="template-description">Send detailed monthly reports to stakeholders</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('report')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('report')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="template-card">
+                            <div class="template-preview">👋</div>
+                            <div class="template-info">
+                                <h3 class="template-title">Welcome Message</h3>
+                                <p class="template-description">Welcome new supporters to your campaign community</p>
+                                <div class="template-actions">
+                                    <button class="btn btn-outline" onclick="previewTemplate('welcome')">Preview</button>
+                                    <button class="btn btn-primary" onclick="useTemplate('welcome')">Use Template</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+                    <button class="btn btn-primary" style="padding: 1.5rem; font-size: 1.1rem;" onclick="openBulkEmail()">
+                        📧 Send Bulk Email
+                    </button>
+                    <button class="btn btn-secondary" style="padding: 1.5rem; font-size: 1.1rem;" onclick="scheduleCommunication()">
+                        ⏰ Schedule Communication
+                    </button>
+                    <button class="btn btn-success" style="padding: 1.5rem; font-size: 1.1rem;" onclick="viewCommunicationHistory()">
+                        📊 Communication History
+                    </button>
+                    <button class="btn btn-outline" style="padding: 1.5rem; font-size: 1.1rem;" onclick="manageDonorSegments()">
+                        🎯 Manage Segments
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Management Page -->
+        <div id="teamPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Team Management</h1>
+                    <p class="page-subtitle">Collaborate with your team members and manage permissions</p>
+                </div>
+
+                <div class="tab-navigation">
+                    <button class="tab-btn active" onclick="showTeamSection('members')">👥 Team Members</button>
+                    <button class="tab-btn" onclick="showTeamSection('roles')">🔑 Roles & Permissions</button>
+                    <button class="tab-btn" onclick="showTeamSection('activity')">📊 Activity Log</button>
+                    <button class="tab-btn" onclick="showTeamSection('collaboration')">🤝 Collaboration</button>
+                </div>
+
+                <!-- Team Members Section -->
+                <div id="teamMembers" class="team-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 style="color: var(--dark-color);">Team Members</h2>
+                        <button class="btn btn-primary" onclick="inviteTeamMember()">
+                            ➕ Invite Member
+                        </button>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">JD</div>
+                        <div class="member-info">
+                            <div class="member-name">John Doe</div>
+                            <div class="member-role">Campaign Creator & Admin</div>
+                        </div>
+                        <div class="member-status status-online">Online</div>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="manageMember(1)">Manage</button>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">SM</div>
+                        <div class="member-info">
+                            <div class="member-name">Sarah Miller</div>
+                            <div class="member-role">Content Manager</div>
+                        </div>
+                        <div class="member-status status-online">Online</div>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="manageMember(2)">Manage</button>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">RJ</div>
+                        <div class="member-info">
+                            <div class="member-name">Robert Johnson</div>
+                            <div class="member-role">Social Media Coordinator</div>
+                        </div>
+                        <div class="member-status status-offline">Offline</div>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="manageMember(3)">Manage</button>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">LW</div>
+                        <div class="member-info">
+                            <div class="member-name">Lisa Wong</div>
+                            <div class="member-role">Donor Relations Specialist</div>
+                        </div>
+                        <div class="member-status status-online">Online</div>
+                        <button class="btn btn-outline" style="padding: 0.5rem 1rem;" onclick="manageMember(4)">Manage</button>
+                    </div>
+                </div>
+
+                <!-- Other Team Sections -->
+                <div id="teamRoles" class="team-section" style="display: none;">
+                    <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Roles & Permissions</h2>
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>Permission Management</h3>
+                        <p>Define roles and set permissions for team members</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Advanced role management coming soon!')">Manage Roles</button>
+                    </div>
+                </div>
+
+                <div id="teamActivity" class="team-section" style="display: none;">
+                    <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Activity Log</h2>
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>Team Activity Tracking</h3>
+                        <p>Monitor team member actions and campaign activities</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Activity logging system coming soon!')">View Activity</button>
+                    </div>
+                </div>
+
+                <div id="teamCollaboration" class="team-section" style="display: none;">
+                    <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Collaboration Tools</h2>
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>Team Collaboration</h3>
+                        <p>Chat, file sharing, and collaborative campaign planning</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Collaboration tools coming soon!')">Open Workspace</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel Page -->
+        <div id="adminPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Platform Administration</h1>
+                    <p class="page-subtitle">Manage platform settings, users, and overall system health</p>
+                </div>
+
+                <div style="text-align: center; padding: 3rem; color: #666;">
+                    <h3>Platform Administration</h3>
+                    <p>Comprehensive admin tools for platform management</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Full admin panel coming in advanced features!')">Access Admin Tools</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Email Composer Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Compose Email</h2>
+                <span class="close" onclick="closeModal('emailModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="email-composer">
+                    <div class="recipient-selector">
+                        <label style="font-weight: 600; color: var(--dark-color); margin-bottom: 1rem; display: block;">Select Recipients</label>
+                        <div class="recipient-options">
+                            <div class="recipient-option">
+                                <input type="checkbox" id="allDonors" checked>
+                                <label for="allDonors">All Donors</label>
+                            </div>
+                            <div class="recipient-option">
+                                <input type="checkbox" id="recentDonors">
+                                <label for="recentDonors">Recent Donors (30 days)</label>
+                            </div>
+                            <div class="recipient-option">
+                                <input type="checkbox" id="topDonors">
+                                <label for="topDonors">Top Donors</label>
+                            </div>
+                            <div class="recipient-option">
+                                <input type="checkbox" id="subscribers">
+                                <label for="subscribers">Campaign Subscribers</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailSubject">Subject Line</label>
+                        <input type="text" id="emailSubject" class="form-control" placeholder="Enter email subject...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emailBody">Email Content</label>
+                        <div class="rich-editor">
+                            <div class="editor-toolbar">
+                                <button type="button" class="editor-btn" onclick="formatEmailText('bold')" title="Bold"><b>B</b></button>
+                                <button type="button" class="editor-btn" onclick="formatEmailText('italic')" title="Italic"><i>I</i></button>
+                                <button type="button" class="editor-btn" onclick="formatEmailText('underline')" title="Underline"><u>U</u></button>
+                                <button type="button" class="editor-btn" onclick="insertEmailVariable('donorName')" title="Insert Donor Name">👤</button>
+                                <button type="button" class="editor-btn" onclick="insertEmailVariable('campaignName')" title="Insert Campaign Name">📋</button>
+                                <button type="button" class="editor-btn" onclick="insertEmailVariable('donationAmount')" title="Insert Donation Amount">💰</button>
+                            </div>
+                            <div class="editor-content" id="emailBody" contenteditable="true" placeholder="Compose your message here. Use the toolbar to insert personalization variables..."></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="saveEmailDraft()">💾 Save Draft</button>
+                        <button class="btn btn-secondary" onclick="previewEmail()">👀 Preview</button>
+                        <button class="btn btn-primary" onclick="sendEmail()">📧 Send Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Share Campaign</h2>
+                <span class="close" onclick="closeModal('shareModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h3 style="color: var(--dark-color); margin-bottom: 1rem;" id="shareModalTitle">Campaign Title</h3>
+                    <div style="background: var(--light-color); padding: 1rem; border-radius: 10px;">
+                        <input type="text" id="shareLink" class="form-control" readonly style="text-align: center; font-family: monospace;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <button class="btn-social btn-facebook" onclick="shareOnSocialPlatform('facebook')" style="justify-content: center;">
+                        📘 Facebook
+                    </button>
+                    <button class="btn-social btn-twitter" onclick="shareOnSocialPlatform('twitter')" style="justify-content: center;">
+                        🐦 Twitter
+                    </button>
+                    <button class="btn-social btn-whatsapp" onclick="shareOnSocialPlatform('whatsapp')" style="justify-content: center;">
+                        💬 WhatsApp
+                    </button>
+                    <button class="btn-social btn-linkedin" onclick="shareOnSocialPlatform('linkedin')" style="justify-content: center;">
+                        💼 LinkedIn
+                    </button>
+                    <button class="btn-social btn-telegram" onclick="shareOnSocialPlatform('telegram')" style="justify-content: center;">
+                        ✈️ Telegram
+                    </button>
+                    <button class="btn btn-outline" onclick="copyToClipboard()" style="justify-content: center;">
+                        🔗 Copy Link
+                    </button>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; background: var(--light-color); border-radius: 10px;">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Custom Message (Optional)</label>
+                    <textarea id="customShareMessage" class="form-control" rows="3" placeholder="Add a personal message to your share..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = { 
+            id: 1, 
+            name: "Demo User", 
+            email: "demo@ketto.com"
+        };
+
+        let campaigns = [
+            {
+                id: 1,
+                title: "Help Rahul Fight Cancer",
+                description: "Supporting a young boy's battle against leukemia. Every contribution makes a difference.",
+                goal: 500000,
+                raised: 325000,
+                donors: 156,
+                creator: "Rahul's Family"
+            },
+            {
+                id: 2,
+                title: "Education for Rural Children",
+                description: "Building a school in a remote village to provide quality education to underprivileged children.",
+                goal: 750000,
+                raised: 420000,
+                donors: 89,
+                creator: "NGO Shiksha"
+            },
+            {
+                id: 3,
+                title: "Flood Relief Kerala",
+                description: "Emergency relief for families affected by recent floods in Kerala.",
+                goal: 1000000,
+                raised: 890000,
+                donors: 245,
+                creator: "Kerala Relief Fund"
+            }
+        ];
+
+        let updates = [];
+        let selectedCampaign = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            showPage('social');
+        });
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+        }
+
+        function showTeamSection(section) {
+            // Hide all team sections
+            document.querySelectorAll('.team-section').forEach(s => {
+                s.style.display = 'none';
+            });
+            
+            // Show selected section
+            const sectionMap = {
+                'members': 'teamMembers',
+                'roles': 'teamRoles',
+                'activity': 'teamActivity',
+                'collaboration': 'teamCollaboration'
+            };
+            
+            document.getElementById(sectionMap[section]).style.display = 'block';
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Social Sharing Functions
+        function shareOnPlatform(platform) {
+            const campaign = selectedCampaign || campaigns[0];
+            const shareText = generateShareText(campaign);
+            const shareUrl = generateCampaignUrl(campaign.id);
+            
+            switch(platform) {
+                case 'facebook':
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
+                    break;
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    break;
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+                    break;
+                case 'linkedin':
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    break;
+                case 'telegram':
+                    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+                    break;
+            }
+            
+            showToast(`Shared on ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`, 'success');
+        }
+
+        function updateSharePreview() {
+            const campaignId = document.getElementById('campaignSelect').value;
+            const sharePreview = document.getElementById('sharePreview');
+            
+            if (!campaignId) {
+                sharePreview.style.display = 'none';
+                return;
+            }
+            
+            const campaign = campaigns.find(c => c.id == campaignId);
+            if (campaign) {
+                selectedCampaign = campaign;
+                document.getElementById('previewTitle').textContent = campaign.title;
+                document.getElementById('previewDescription').textContent = campaign.description;
+                document.getElementById('previewRaised').textContent = `₹${formatNumber(campaign.raised)} raised`;
+                document.getElementById('previewGoal').textContent = `of ₹${formatNumber(campaign.goal)} goal`;
+                document.getElementById('previewDonors').textContent = `${campaign.donors} donors`;
+                sharePreview.style.display = 'block';
+            }
+        }
+
+        function shareSelectedCampaign(platform) {
+            if (!selectedCampaign) {
+                showToast('Please select a campaign first', 'warning');
+                return;
+            }
+            shareOnPlatform(platform);
+        }
+
+        function copyShareLink() {
+            if (!selectedCampaign) {
+                showToast('Please select a campaign first', 'warning');
+                return;
+            }
+            
+            const shareUrl = generateCampaignUrl(selectedCampaign.id);
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Campaign link copied to clipboard!', 'success');
+            });
+        }
+
+        function generateShareText(campaign) {
+            return `Help support "${campaign.title}" - Together we can make a difference! ₹${formatNumber(campaign.raised)} raised of ₹${formatNumber(campaign.goal)} goal with ${campaign.donors} donors.`;
+        }
+
+        function generateCampaignUrl(campaignId) {
+            return `https://ketto.org/campaign/${campaignId}`;
+        }
+
+        // Campaign Updates Functions
+        function postUpdate(event) {
+            event.preventDefault();
+            
+            const campaignId = document.getElementById('updateCampaign').value;
+            const title = document.getElementById('updateTitle').value;
+            const content = document.getElementById('updateContent').innerHTML;
+            const notifyDonors = document.getElementById('notifyDonors').checked;
+            const shareOnSocial = document.getElementById('shareOnSocial').checked;
+            
+            if (!campaignId || !title || !content.trim()) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            const campaign = campaigns.find(c => c.id == campaignId);
+            const newUpdate = {
+                id: updates.length + 1,
+                campaignId: parseInt(campaignId),
+                campaignTitle: campaign.title,
+                title: title,
+                content: content,
+                author: currentUser.name,
+                date: new Date().toISOString().split('T')[0],
+                views: 0,
+                reactions: 0,
+                comments: 0,
+                shares: 0
+            };
+            
+            updates.unshift(newUpdate);
+            
+            // Clear form
+            document.getElementById('updateCampaign').value = '';
+            document.getElementById('updateTitle').value = '';
+            document.getElementById('updateContent').innerHTML = '';
+            document.getElementById('notifyDonors').checked = true;
+            document.getElementById('shareOnSocial').checked = false;
+            
+            // Add to updates feed
+            addUpdateToFeed(newUpdate);
+            
+            let message = 'Update posted successfully!';
+            if (notifyDonors) message += ' Donors will be notified via email.';
+            if (shareOnSocial) message += ' Shared on social media.';
+            
+            showToast(message, 'success');
+        }
+
+        function addUpdateToFeed(update) {
+            const updatesList = document.getElementById('updatesList');
+            const updateElement = document.createElement('div');
+            updateElement.className = 'update-item';
+            updateElement.innerHTML = `
+                <div class="update-header">
+                    <div>
+                        <h4 style="color: var(--dark-color); margin-bottom: 0.25rem;">${update.title}</h4>
+                        <div class="update-meta">
+                            <span>${update.campaignTitle}</span>
+                            <span>•</span>
+                            <span>Just now</span>
+                            <span>•</span>
+                            <span>By ${update.author}</span>
+                        </div>
+                    </div>
+                    <div class="update-actions">
+                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="editUpdate(${update.id})">Edit</button>
+                        <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="shareUpdate(${update.id})">Share</button>
+                    </div>
+                </div>
+                <div class="update-content">
+                    ${update.content}
+                </div>
+                <div class="update-stats">
+                    <span>👀 ${update.views} views</span>
+                    <span>❤️ ${update.reactions} reactions</span>
+                    <span>💬 ${update.comments} comments</span>
+                    <span>📤 ${update.shares} shares</span>
+                </div>
+            `;
+            
+            updatesList.insertBefore(updateElement, updatesList.firstChild);
+        }
+
+        function editUpdate(updateId) {
+            showToast('Update editing feature coming soon!', 'info');
+        }
+
+        function shareUpdate(updateId) {
+            const update = updates.find(u => u.id === updateId);
+            if (update) {
+                selectedCampaign = campaigns.find(c => c.id === update.campaignId);
+                document.getElementById('shareModalTitle').textContent = update.title;
+                document.getElementById('shareLink').value = generateCampaignUrl(update.campaignId) + '/update/' + updateId;
+                openModal('shareModal');
+            }
+        }
+
+        function saveDraft() {
+            const title = document.getElementById('updateTitle').value;
+            const content = document.getElementById('updateContent').innerHTML;
+            
+            if (title || content.trim()) {
+                localStorage.setItem('updateDraft', JSON.stringify({
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                }));
+                showToast('Draft saved successfully!', 'success');
+            }
+        }
+
+        // Rich Text Editor Functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('updateContent').focus();
+        }
+
+        function formatEmailText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('emailBody').focus();
+        }
+
+        function insertEmailVariable(variable) {
+            const variables = {
+                'donorName': '[DONOR_NAME]',
+                'campaignName': '[CAMPAIGN_NAME]',
+                'donationAmount': '[DONATION_AMOUNT]'
+            };
+            
+            const editor = document.getElementById('emailBody');
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(variables[variable]));
+            }
+            editor.focus();
+        }
+
+        // Email Functions
+        function openEmailComposer() {
+            openModal('emailModal');
+        }
+
+        function useTemplate(templateType) {
+            const templates = {
+                'thankyou': {
+                    subject: 'Thank you for your generous donation!',
+                    body: 'Dear [DONOR_NAME],<br><br>Thank you so much for your generous donation of [DONATION_AMOUNT] to [CAMPAIGN_NAME]. Your support means the world to us and brings us one step closer to our goal.<br><br>We will keep you updated on our progress.<br><br>With gratitude,<br>Campaign Team'
+                },
+                'update': {
+                    subject: 'Important update on [CAMPAIGN_NAME]',
+                    body: 'Dear [DONOR_NAME],<br><br>We have an important update to share about [CAMPAIGN_NAME]. Thanks to your support, we have made significant progress...<br><br>Best regards,<br>Campaign Team'
+                },
+                'celebration': {
+                    subject: 'We did it! [CAMPAIGN_NAME] goal achieved!',
+                    body: 'Dear [DONOR_NAME],<br><br>Amazing news! Thanks to supporters like you, we have successfully reached our fundraising goal for [CAMPAIGN_NAME]!<br><br>Thank you for being part of this incredible journey.<br><br>Celebrating together,<br>Campaign Team'
+                },
+                'urgency': {
+                    subject: 'Urgent: Only [DAYS_LEFT] days left for [CAMPAIGN_NAME]',
+                    body: 'Dear [DONOR_NAME],<br><br>Time is running out for [CAMPAIGN_NAME]. We have only [DAYS_LEFT] days left to reach our goal, and we need your help now more than ever.<br><br>Please consider making a donation or sharing with your network.<br><br>Urgently yours,<br>Campaign Team'
+                },
+                'report': {
+                    subject: 'Monthly Report: [CAMPAIGN_NAME] Progress',
+                    body: 'Dear [DONOR_NAME],<br><br>Here is your monthly report on the progress of [CAMPAIGN_NAME]:<br><br>• Total raised: [AMOUNT_RAISED]<br>• Number of donors: [DONOR_COUNT]<br>• Recent milestones: ...<br><br>Thank you for your continued support.<br><br>Best regards,<br>Campaign Team'
+                },
+                'welcome': {
+                    subject: 'Welcome to [CAMPAIGN_NAME] community!',
+                    body: 'Dear [DONOR_NAME],<br><br>Welcome to the [CAMPAIGN_NAME] community! Thank you for joining us in this important cause.<br><br>We will keep you updated on our progress and how your support is making a difference.<br><br>Welcome aboard,<br>Campaign Team'
+                }
+            };
+            
+            const template = templates[templateType];
+            if (template) {
+                document.getElementById('emailSubject').value = template.subject;
+                document.getElementById('emailBody').innerHTML = template.body;
+                openModal('emailModal');
+            }
+        }
+
+        function previewTemplate(templateType) {
+            useTemplate(templateType);
+            showToast('Template loaded in composer', 'info');
+        }
+
+        function saveEmailDraft() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').innerHTML;
+            
+            if (subject || body.trim()) {
+                localStorage.setItem('emailDraft', JSON.stringify({
+                    subject: subject,
+                    body: body,
+                    timestamp: new Date().toISOString()
+                }));
+                showToast('Email draft saved!', 'success');
+            }
+        }
+
+        function previewEmail() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').innerHTML;
+            
+            if (!subject || !body.trim()) {
+                showToast('Please add subject and content first', 'warning');
+                return;
+            }
+            
+            showToast('Email preview opened in new window', 'info');
+        }
+
+        function sendEmail() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').innerHTML;
+            const allDonors = document.getElementById('allDonors').checked;
+            const recentDonors = document.getElementById('recentDonors').checked;
+            const topDonors = document.getElementById('topDonors').checked;
+            const subscribers = document.getElementById('subscribers').checked;
+            
+            if (!subject || !body.trim()) {
+                showToast('Please add subject and content first', 'warning');
+                return;
+            }
+            
+            if (!allDonors && !recentDonors && !topDonors && !subscribers) {
+                showToast('Please select at least one recipient group', 'warning');
+                return;
+            }
+            
+            let recipientCount = 0;
+            if (allDonors) recipientCount += 500;
+            if (recentDonors) recipientCount += 150;
+            if (topDonors) recipientCount += 50;
+            if (subscribers) recipientCount += 200;
+            
+            closeModal('emailModal');
+            showToast(`Email sent to ${recipientCount} recipients!`, 'success');
+            
+            // Clear form
+            document.getElementById('emailSubject').value = '';
+            document.getElementById('emailBody').innerHTML = '';
+        }
+
+        // Communication Functions
+        function openBulkEmail() {
+            openModal('emailModal');
+        }
+
+        function scheduleCommunication() {
+            showToast('Communication scheduling feature coming soon!', 'info');
+        }
+
+        function viewCommunicationHistory() {
+            showToast('Communication history viewer coming soon!', 'info');
+        }
+
+        function manageDonorSegments() {
+            showToast('Donor segmentation tools coming soon!', 'info');
+        }
+
+        // Creative Studio Functions
+        function openCreativeStudio() {
+            showToast('Creative studio with design tools coming soon!', 'info');
+        }
+
+        function viewSocialAnalytics() {
+            showToast('Social media analytics dashboard coming soon!', 'info');
+        }
+
+        // Team Management Functions
+        function inviteTeamMember() {
+            showToast('Team member invitation system coming soon!', 'info');
+        }
+
+        function manageMember(memberId) {
+            showToast('Member management tools coming soon!', 'info');
+        }
+
+        // Share Modal Functions
+        function shareOnSocialPlatform(platform) {
+            const customMessage = document.getElementById('customShareMessage').value;
+            const shareUrl = document.getElementById('shareLink').value;
+            
+            let shareText = customMessage;
+            if (!shareText && selectedCampaign) {
+                shareText = generateShareText(selectedCampaign);
+            }
+            
+            switch(platform) {
+                case 'facebook':
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank');
+                    break;
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    break;
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+                    break;
+                case 'linkedin':
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                    break;
+                case 'telegram':
+                    window.open(`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank');
+                    break;
+            }
+            
+            closeModal('shareModal');
+            showToast(`Shared on ${platform.charAt(0).toUpperCase() + platform.slice(1)}!`, 'success');
+        }
+
+        function copyToClipboard() {
+            const shareUrl = document.getElementById('shareLink').value;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Link copied to clipboard!', 'success');
+                closeModal('shareModal');
+            });
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Utility Functions
+        function loadUserData() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 10000000) {
+                return (num / 10000000).toFixed(1) + 'Cr';
+            } else if (num >= 100000) {
+                return (num / 100000).toFixed(1) + 'L';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString('en-IN');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showMessage(message) {
+            showToast(message, 'info');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            showMessage('Logged out successfully');
+        }
+
+        // Load drafts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load update draft
+            const updateDraft = localStorage.getItem('updateDraft');
+            if (updateDraft) {
+                const draft = JSON.parse(updateDraft);
+                if (confirm('You have an unsaved update draft. Would you like to continue where you left off?')) {
+                    document.getElementById('updateTitle').value = draft.title;
+                    document.getElementById('updateContent').innerHTML = draft.content;
+                }
+            }
+            
+            // Load email draft
+            const emailDraft = localStorage.getItem('emailDraft');
+            if (emailDraft) {
+                const draft = JSON.parse(emailDraft);
+                // Email draft will be loaded when modal opens
+            }
+        });
+
+        // Click outside to close dropdowns and modals
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('dropdownMenu');
+            
+            if (!userMenu.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+            
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const activeModals = document.querySelectorAll('.modal.active');
+                activeModals.forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+            
+            // Ctrl+S to save drafts
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                if (document.getElementById('updateTitle').value || document.getElementById('updateContent').innerHTML.trim()) {
+                    saveDraft();
+                }
+                if (document.getElementById('emailSubject').value || document.getElementById('emailBody').innerHTML.trim()) {
+                    saveEmailDraft();
+                }
+            }
+        });
+
+        // Auto-save functionality
+        let autoSaveInterval;
+        
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                // Auto-save update draft
+                const updateTitle = document.getElementById('updateTitle').value;
+                const updateContent = document.getElementById('updateContent').innerHTML;
+                if (updateTitle || updateContent.trim()) {
+                    localStorage.setItem('updateDraft', JSON.stringify({
+                        title: updateTitle,
+                        content: updateContent,
+                        timestamp: new Date().toISOString()
+                    }));
+                }
+                
+                // Auto-save email draft
+                const emailSubject = document.getElementById('emailSubject').value;
+                const emailBody = document.getElementById('emailBody').innerHTML;
+                if (emailSubject || emailBody.trim()) {
+                    localStorage.setItem('emailDraft', JSON.stringify({
+                        subject: emailSubject,
+                        body: emailBody,
+                        timestamp: new Date().toISOString()
+                    }));
+                }
+            }, 30000); // Auto-save every 30 seconds
+        }
+
+        // Start auto-save when user starts typing
+        document.addEventListener('DOMContentLoaded', function() {
+            const autoSaveFields = ['updateTitle', 'updateContent', 'emailSubject', 'emailBody'];
+            autoSaveFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        if (!autoSaveInterval) {
+                            startAutoSave();
+                        }
+                    });
+                }
+            });
+        });
+
+        // Initialize page
+        setTimeout(() => {
+            showToast('Social Hub loaded successfully! Start sharing your campaigns.', 'success');
+        }, 1000);
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto - Social Features & Communication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --info-color: #17a2b8;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --gradient-success: linear-gradient(135deg, var(--success-color), #2ecc71);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+            padding: 1rem 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        /* Main Layout */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* Navigation Tabs */
+        .tab-navigation {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            padding: 0.75rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-social {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-facebook {
+            background: #1877f2;
+            color: white;
+        }
+
+        .btn-twitter {
+            background: #1da1f2;
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .btn-linkedin {
+            background: #0077b5;
+            color: white;
+        }
+
+        .btn-telegram {
+            background: #0088cc;
+            color: white;
+        }
+
+        .btn-social:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Social Sharing Section */
+        .social-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .social-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .social-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .social-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .sharing-tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .share-card {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .share-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .share-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .share-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .share-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Campaign Updates */
+        .updates-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .update-composer {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .updates-feed {
+            margin-top: 2rem;
+        }
+
+        .update-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .update-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .update-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .update-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .update-content {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .update-stats {
+            display: flex;
+            gap: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Email Templates */
+        .email-templates {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .template-card {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .template-preview {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .template-info {
+            padding: 1.5rem;
+        }
+
+        .template-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .template-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Communication Dashboard */
+        .communication-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* Team Collaboration */
+        .team-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            background: var(--light-color);
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .member-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-offline {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+            background: var(--light-color);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Email Composer */
+        .email-composer {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .recipient-selector {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .recipient-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .recipient-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rich-editor {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            background: var(--light-color);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .editor-btn {
+            padding: 0.5rem;
+            border: none;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .editor-btn:hover,
+        .editor-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .editor-content {
+            min-height: 300px;
+            padding: 1.5rem;
+            outline: none;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sharing-tools {
+                grid-template-columns: 1fr;
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .communication-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab-navigation {
+                gap: 0.5rem;
+            }
+
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .social-buttons {
+                flex-direction: column;
+            }
+
+            .btn-social {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 250px;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--error-color); }
+        .toast.info { background: var(--info-color); }
+        .toast.warning { background: var(--warning-color); }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a class="logo" onclick="showPage('social')">Ketto</a>
+            
+            <ul class="nav-links">
+                <li><a onclick="showPage('social')" class="active">Social Hub</a></li>
+                <li><a onclick="showPage('updates')">Campaign Updates</a></li>
+                <li><a onclick="showPage('communication')">Communication</a></li>
+                <li><a onclick="showPage('team')">Team</a></li>
+                <li><a onclick="showPage('admin')">Admin</a></li>
+            </ul>
+
+            <div class="user-menu">
+                <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatar">U</div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#" class="dropdown-item" onclick="showPage('social')">Social Hub</a>
+                    <a href="#" class="dropdown-item" onclick="showPage('communication')">Communication Center</a>
+                    <a href="#" class="dropdown-item" onclick="showPage('team')">Team Management</a>
+                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <button class="dropdown-item" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Social Hub Page -->
+        <div id="socialPage" class="page active">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Social Hub</h1>
+                    <p class="page-subtitle">Amplify your campaigns through social media and community engagement</p>
+                </div>
+
+                <!-- Social Sharing Tools -->
+                <div class="social-section">
+                    <div class="social-header">
+                        <h2 class="social-title">Campaign Promotion Tools</h2>
+                        <p class="social-subtitle">Share your campaigns across social platforms to reach more supporters</p>
+                    </div>
+
+                    <div class="sharing-tools">
+                        <div class="share-card">
+                            <div class="share-icon">📱</div>
+                            <h3 class="share-title">Social Media Sharing</h3>
+                            <p class="share-description">Share your campaigns with custom messages across all major social platforms</p>
+                            <div class="social-buttons">
+                                <a href="#" class="btn-social btn-facebook" onclick="shareOnPlatform('facebook')">
+                                    📘 Facebook
+                                </a>
+                                <a href="#" class="btn-social btn-twitter" onclick="shareOnPlatform('twitter')">
+                                    🐦 Twitter
+                                </a>
+                                <a href="#" class="btn-social btn-linkedin" onclick="shareOnPlatform('linkedin')">
+                                    💼 LinkedIn
+                                </a>
+                                <a href="#" class="btn-social btn-whatsapp" onclick="shareOnPlatform('whatsapp')">
+                                    💬 WhatsApp
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="share-card">
+                            <div class="share-icon">🎨</div>
+                            <h3 class="share-title">Visual Content Creator</h3>
+                            <p class="share-description">Generate beautiful graphics and social media posts for your campaigns</p>
+                            <div class="social-buttons">
+                                <button class="btn btn-primary" onclick="openCreativeStudio()">
+                                    🎨 Open Creative Studio
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="share-card">
+                            <div class="share-icon">📧</div>
+                            <h3 class="share-title">Email & Messaging</h3>
+                            <p class="share-description">Send personalized messages to your network via email and messaging apps</p>
+                            <div class="social-buttons">
+                                <button class="btn btn-outline" onclick="openEmailComposer()">
+                                    📧 Compose Email
+                                </button>
+                                <a href="#" class="btn-social btn-telegram" onclick="shareOnPlatform('telegram')">
+                                    ✈️ Telegram
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="share-card">
+                            <div class="share-icon">📊</div>
+                            <h3 class="share-title">Social Analytics</h3>
+                            <p class="share-description">Track engagement, shares, and conversion from social media traffic</p>
+                            <div class="social-buttons">
+                                <button class="btn btn-secondary" onclick="viewSocialAnalytics()">
+                                    📊 View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Share Widget -->
+                <div class="social-section">
+                    <div class="social-header">
+                        <h2 class="social-title">Quick Campaign Share</h2>
+                        <p class="social-subtitle">Select a campaign to share instantly</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="campaignSelect">Select Campaign to Share</label>
+                        <select id="campaignSelect" class="form-control" onchange="updateSharePreview()">
+                            <option value="">Choose a campaign...</option>
+                            <option value="1">Help Rahul Fight Cancer</option>
+                            <option value="2">Education for Rural Children</option>
+                            <option value="3">Flood Relief Kerala</option>
+                        </select>
+                    </div>
+
+                    <div id="sharePreview" style="display: none; background: var(--light-color); padding: 2rem; border-radius: 15px; margin-top: 1rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--dark-color);">Share Preview</h3>
+                        <div style="border: 2px solid var(--border-color); border-radius: 10px; padding: 1.5rem; background: white;">
+                            <h4 id="previewTitle">Campaign Title</h4>
+                            <p id="previewDescription" style="color: #666; margin: 0.5rem 0;">Campaign description...</p>
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                <span style="color: var(--success-color); font-weight: 600;" id="previewRaised">₹

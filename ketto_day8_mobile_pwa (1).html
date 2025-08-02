@@ -1,0 +1,2195 @@
+                <div class="nav-user-info">
+                    <h3 id="navUserName">Demo User</h3>
+                    <p id="navUserEmail">demo@ketto.com</p>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-item active" onclick="showPage('home')">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </button>
+                <button class="nav-item" onclick="showPage('campaigns')">
+                    <span class="nav-icon">🎯</span>
+                    <span>My Campaigns</span>
+                </button>
+                <button class="nav-item" onclick="showPage('donations')">
+                    <span class="nav-icon">💝</span>
+                    <span>My Donations</span>
+                </button>
+                <button class="nav-item" onclick="showPage('discover')">
+                    <span class="nav-icon">🔍</span>
+                    <span>Discover</span>
+                </button>
+                <button class="nav-item" onclick="showPage('analytics')">
+                    <span class="nav-icon">📊</span>
+                    <span>Analytics</span>
+                </button>
+                <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border-color);">
+                <button class="nav-item" onclick="showPage('settings')">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </button>
+                <button class="nav-item" onclick="showPage('help')">
+                    <span class="nav-icon">❓</span>
+                    <span>Help & Support</span>
+                </button>
+                <button class="nav-item" onclick="logout()">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Pull to Refresh Indicator -->
+        <div class="pull-refresh" id="pullRefresh">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Application State
+        let currentUser = {
+            id: 1,
+            name: "Demo User",
+            email: "demo@ketto.com",
+            avatar: "D"
+        };
+
+        let isOnline = navigator.onLine;
+        let deferredPrompt;
+        let pullStartY = 0;
+        let pullDistance = 0;
+        let isPulling = false;
+
+        // Initialize PWA
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePWA();
+            loadUserData();
+            registerServiceWorker();
+            setupPullToRefresh();
+            checkInstallPrompt();
+            updateOnlineStatus();
+        });
+
+        // PWA Initialization
+        function initializePWA() {
+            // Set viewport height for mobile browsers
+            setViewportHeight();
+            
+            // Initialize user interface
+            updateUserAvatar();
+            
+            // Setup offline/online detection
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+            
+            // Handle back button
+            window.addEventListener('popstate', handleBackButton);
+            
+            // Prevent zoom on double tap
+            document.addEventListener('touchend', preventZoom);
+            
+            showToast('Welcome to Ketto Mobile! 📱', 'success');
+        }
+
+        // Service Worker Registration
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered:', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showToast('App updated! Restart to get new features', 'info');
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => console.log('SW registration failed:', error));
+            }
+        }
+
+        // Install PWA Prompt
+        function checkInstallPrompt() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Show install banner after 30 seconds
+                setTimeout(() => {
+                    if (!isAppInstalled()) {
+                        showInstallBanner();
+                    }
+                }, 30000);
+            });
+
+            // Handle successful installation
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA installed successfully');
+                hideInstallBanner();
+                showToast('App installed successfully! 🎉', 'success');
+            });
+        }
+
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true;
+        }
+
+        function showInstallBanner() {
+            document.getElementById('installBanner').classList.add('show');
+        }
+
+        function hideInstallBanner() {
+            document.getElementById('installBanner').classList.remove('show');
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+            hideInstallBanner();
+        }
+
+        function dismissInstallBanner() {
+            hideInstallBanner();
+            localStorage.setItem('installBannerDismissed', 'true');
+        }
+
+        // Offline/Online Handling
+        function handleOnline() {
+            isOnline = true;
+            document.getElementById('offlineBanner').classList.remove('show');
+            showToast('Connection restored! 🌐', 'success');
+            syncOfflineData();
+        }
+
+        function handleOffline() {
+            isOnline = false;
+            document.getElementById('offlineBanner').classList.add('show');
+            showToast('You\'re now offline 📵', 'warning');
+        }
+
+        function updateOnlineStatus() {
+            if (!isOnline) {
+                document.getElementById('offlineBanner').classList.add('show');
+            }
+        }
+
+        function syncOfflineData() {
+            // Sync any offline data when connection is restored
+            const offlineData = localStorage.getItem('offlineActions');
+            if (offlineData) {
+                const actions = JSON.parse(offlineData);
+                actions.forEach(action => {
+                    // Process offline actions (donations, campaign updates, etc.)
+                    console.log('Syncing offline action:', action);
+                });
+                localStorage.removeItem('offlineActions');
+                showToast('Offline data synced! ✅', 'info');
+            }
+        }
+
+        // Navigation Functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            // Update bottom navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find and activate corresponding nav tab
+            const activeTab = Array.from(document.querySelectorAll('.nav-tab')).find(tab => {
+                return tab.onclick && tab.onclick.toString().includes(pageId);
+            });
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            // Update side navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+                return item.onclick && item.onclick.toString().includes(pageId);
+            });
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+            
+            // Close side nav if open
+            closeSideNav();
+            
+            // Load page-specific data
+            loadPageData(pageId);
+            
+            // Update page history for back button
+            history.pushState({page: pageId}, '', `#${pageId}`);
+        }
+
+        function loadPageData(pageId) {
+            switch(pageId) {
+                case 'campaigns':
+                    loadMyCampaigns();
+                    break;
+                case 'discover':
+                    loadDiscoverCampaigns();
+                    break;
+                case 'analytics':
+                    updateAnalytics();
+                    break;
+                case 'donations':
+                    loadMyDonations();
+                    break;
+            }
+        }
+
+        function toggleSideNav() {
+            const sideNav = document.getElementById('sideNav');
+            const overlay = document.getElementById('navOverlay');
+            
+            sideNav.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSideNav() {
+            const sideNav = document.getElementById('sideNav');
+            const overlay = document.getElementById('navOverlay');
+            
+            sideNav.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openNotifications() {
+            document.getElementById('notificationPanel').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNotifications() {
+            document.getElementById('notificationPanel').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Pull to Refresh
+        function setupPullToRefresh() {
+            let startY = 0;
+            let currentY = 0;
+            let isDragging = false;
+            
+            document.addEventListener('touchstart', (e) => {
+                if (window.scrollY === 0) {
+                    startY = e.touches[0].clientY;
+                    isDragging = true;
+                }
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                
+                currentY = e.touches[0].clientY;
+                const deltaY = currentY - startY;
+                
+                if (deltaY > 0 && window.scrollY === 0) {
+                    e.preventDefault();
+                    const pullDistance = Math.min(deltaY * 0.5, 100);
+                    
+                    if (pullDistance > 60) {
+                        document.getElementById('pullRefresh').classList.add('show');
+                    }
+                }
+            });
+            
+            document.addEventListener('touchend', () => {
+                if (isDragging) {
+                    const deltaY = currentY - startY;
+                    if (deltaY > 60) {
+                        refreshData();
+                    }
+                    document.getElementById('pullRefresh').classList.remove('show');
+                    isDragging = false;
+                }
+            });
+        }
+
+        function refreshData() {
+            showToast('Refreshing data... 🔄', 'info');
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                updateDashboardStats();
+                showToast('Data refreshed! ✅', 'success');
+            }, 1500);
+        }
+
+        // User Data Management
+        function loadUserData() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+            }
+            updateUserInterface();
+        }
+
+        function updateUserInterface() {
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+            document.getElementById('navAvatar').textContent = currentUser.name.charAt(0);
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('navUserEmail').textContent = currentUser.email;
+        }
+
+        function updateUserAvatar() {
+            const avatars = document.querySelectorAll('.user-avatar, .nav-avatar');
+            avatars.forEach(avatar => {
+                avatar.textContent = currentUser.name.charAt(0);
+            });
+        }
+
+        // Campaign Functions
+        function openCampaign(campaignId) {
+            showToast(`Opening campaign ${campaignId}...`, 'info');
+            // In a real app, this would navigate to campaign detail page
+        }
+
+        function donateToCampaign(campaignId, event) {
+            event.stopPropagation();
+            
+            if (!isOnline) {
+                showToast('Donation requires internet connection', 'warning');
+                return;
+            }
+            
+            showToast('Opening donation page...', 'info');
+            // In a real app, this would open donation flow
+        }
+
+        function createCampaign(event) {
+            event.preventDefault();
+            
+            if (!isOnline) {
+                // Store offline for later sync
+                const offlineActions = JSON.parse(localStorage.getItem('offlineActions') || '[]');
+                offlineActions.push({
+                    type: 'createCampaign',
+                    data: new FormData(event.target),
+                    timestamp: Date.now()
+                });
+                localStorage.setItem('offlineActions', JSON.stringify(offlineActions));
+                showToast('Campaign saved offline. Will sync when online.', 'warning');
+            } else {
+                showToast('Campaign created successfully! 🎉', 'success');
+                showPage('campaigns');
+            }
+        }
+
+        function editCampaign(campaignId) {
+            showToast(`Editing campaign ${campaignId}...`, 'info');
+        }
+
+        function shareCampaign(campaignId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Help Support This Campaign',
+                    text: 'Check out this campaign on Ketto',
+                    url: `https://ketto.org/campaign/${campaignId}`
+                });
+            } else {
+                // Fallback for browsers without Web Share API
+                shareApp();
+            }
+        }
+
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Ketto - Crowdfunding App',
+                    text: 'Fund dreams, change lives with Ketto',
+                    url: window.location.href
+                });
+            } else {
+                // Copy to clipboard fallback
+                navigator.clipboard.writeText(window.location.href);
+                showToast('App link copied to clipboard! 📋', 'success');
+            }
+        }
+
+        // Data Loading Functions
+        function updateDashboardStats() {
+            // Simulate updating stats with small variations
+            const stats = {
+                campaigns: 3,
+                raised: '₹2.4L',
+                donors: 156,
+                successRate: '87%'
+            };
+            
+            document.getElementById('totalCampaigns').textContent = stats.campaigns;
+            document.getElementById('totalRaised').textContent = stats.raised;
+            document.getElementById('totalDonors').textContent = stats.donors;
+            document.getElementById('successRate').textContent = stats.successRate;
+        }
+
+        function loadMyCampaigns() {
+            // Simulate loading user's campaigns
+            console.log('Loading user campaigns...');
+        }
+
+        function loadDiscoverCampaigns() {
+            // Simulate loading discover campaigns
+            console.log('Loading discover campaigns...');
+        }
+
+        function loadMyDonations() {
+            // Simulate loading user's donations
+            console.log('Loading user donations...');
+        }
+
+        function updateAnalytics() {
+            // Simulate updating analytics data
+            console.log('Updating analytics...');
+        }
+
+        // Settings Functions
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            showToast(isDark ? 'Dark mode enabled 🌙' : 'Light mode enabled ☀️', 'info');
+        }
+
+        function clearCache() {
+            localStorage.removeItem('offlineActions');
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    cacheNames.forEach(cacheName => {
+                        caches.delete(cacheName);
+                    });
+                });
+            }
+            showToast('Cache cleared successfully! 🗑️', 'success');
+        }
+
+        // Help Functions
+        function toggleFAQ(id) {
+            const faq = document.getElementById(`faq${id}`);
+            const isVisible = faq.style.display === 'block';
+            
+            // Close all FAQs
+            document.querySelectorAll('[id^="faq"]').forEach(f => {
+                f.style.display = 'none';
+            });
+            
+            // Toggle current FAQ
+            if (!isVisible) {
+                faq.style.display = 'block';
+            }
+        }
+
+        function contactSupport(method) {
+            switch(method) {
+                case 'chat':
+                    showToast('Opening live chat...', 'info');
+                    break;
+                case 'email':
+                    window.location.href = 'mailto:support@ketto.com';
+                    break;
+                case 'phone':
+                    window.location.href = 'tel:+911234567890';
+                    break;
+            }
+        }
+
+        // Utility Functions
+        function downloadReceipt(donationId) {
+            showToast(`Downloading receipt for donation ${donationId}...`, 'info');
+        }
+
+        function filterCategory(category) {
+            showToast(`Filtering by ${category} category...`, 'info');
+            // In a real app, this would filter the campaigns
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            showToast('Logged out successfully', 'info');
+            closeSideNav();
+            // In a real app, this would redirect to login
+        }
+
+        function handleBackButton(event) {
+            if (event.state && event.state.page) {
+                showPage(event.state.page);
+            }
+        }
+
+        function preventZoom(e) {
+            let t2 = e.timeStamp;
+            let t1 = e.currentTarget.dataset.lastTouch || t2;
+            let dt = t2 - t1;
+            let fingers = e.touches.length;
+            e.currentTarget.dataset.lastTouch = t2;
+            
+            if (!dt || dt > 500 || fingers > 1) return; // Not a double tap
+            
+            e.preventDefault();
+            e.target.click();
+        }
+
+        function setViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto-hide
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Haptic Feedback (if supported)
+        function hapticFeedback(type = 'light') {
+            if ('vibrate' in navigator) {
+                switch(type) {
+                    case 'light':
+                        navigator.vibrate(10);
+                        break;
+                    case 'medium':
+                        navigator.vibrate(50);
+                        break;
+                    case 'heavy':
+                        navigator.vibrate(100);
+                        break;
+                }
+            }
+        }
+
+        // Add haptic feedback to buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn') || 
+                e.target.classList.contains('nav-tab') || 
+                e.target.classList.contains('action-btn')) {
+                hapticFeedback('light');
+            }
+        });
+
+        // Handle viewport changes (keyboard open/close)
+        window.addEventListener('resize', () => {
+            setViewportHeight();
+        });
+
+        // Initialize dark mode from settings
+        document.addEventListener('DOMContentLoaded', () => {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('input[onchange="toggleDarkMode()"]').checked = true;
+            }
+        });
+
+        // Performance optimization: Lazy loading
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Load content when it comes into view
+                    const element = entry.target;
+                    if (element.dataset.src) {
+                        element.src = element.dataset.src;
+                        observer.unobserve(element);
+                    }
+                }
+            });
+        });
+
+        // Battery API integration (if supported)
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(battery => {
+                function updateBatteryStatus() {
+                    if (battery.level < 0.2 && !battery.charging) {
+                        // Enable power saving mode
+                        document.body.classList.add('power-save');
+                    } else {
+                        document.body.classList.remove('power-save');
+                    }
+                }
+                
+                battery.addEventListener('levelchange', updateBatteryStatus);
+                battery.addEventListener('chargingchange', updateBatteryStatus);
+                updateBatteryStatus();
+            });
+        }
+
+        // Initialize page based on URL hash
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.slice(1);
+            if (hash && document.getElementById(hash + 'Page')) {
+                showPage(hash);
+            }
+        });
+
+        // Add visual feedback for touch interactions
+        document.addEventListener('touchstart', (e) => {
+            e.target.style.opacity = '0.7';
+        });
+
+        document.addEventListener('touchend', (e) => {
+            setTimeout(() => {
+                e.target.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+
+    <!-- Service Worker Definition (inline for demo) -->
+    <script>
+        // Service Worker code would typically be in a separate sw.js file
+        const swCode = `
+            const CACHE_NAME = 'ketto-v1.0.0';
+            const urlsToCache = [
+                '/',
+                '/offline.html'
+            ];
+
+            self.addEventListener('install', (event) => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then((cache) => cache.addAll(urlsToCache))
+                );
+            });
+
+            self.addEventListener('fetch', (event) => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then((response) => {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request);
+                        })
+                );
+            });
+
+            self.addEventListener('sync', (event) => {
+                if (event.tag === 'sync-donations') {
+                    event.waitUntil(syncDonations());
+                }
+            });
+
+            function syncDonations() {
+                // Sync offline donations when connection is restored
+                return new Promise((resolve) => {
+                    console.log('Syncing offline donations...');
+                    resolve();
+                });
+            }
+        `;
+
+        // Register service worker with inline code for demo
+        if ('serviceWorker' in navigator) {
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(registration => {
+                    console.log('Service Worker registered successfully');
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+    </script>
+</body>
+</html>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home/Dashboard -->
+            <div id="homePage" class="page active">
+                <div class="dashboard">
+                    <div class="welcome-card">
+                        <h2 class="welcome-title">Welcome back, Demo! 👋</h2>
+                        <p class="welcome-subtitle">Track your impact and manage campaigns on the go</p>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card" onclick="showPage('campaigns')">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-value" id="totalCampaigns">3</div>
+                            <div class="stat-label">Active Campaigns</div>
+                        </div>
+                        <div class="stat-card" onclick="showPage('donations')">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-value" id="totalRaised">₹2.4L</div>
+                            <div class="stat-label">Total Raised</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="totalDonors">156</div>
+                            <div class="stat-label">Supporters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-value" id="successRate">87%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <h3 class="section-title">Quick Actions</h3>
+                        <div class="action-buttons">
+                            <a href="#" class="action-btn" onclick="showPage('create')">
+                                <span class="action-icon">➕</span>
+                                <span>Create Campaign</span>
+                            </a>
+                            <a href="#" class="action-btn" onclick="showPage('discover')">
+                                <span class="action-icon">🔍</span>
+                                <span>Discover</span>
+                            </a>
+                            <a href="#" class="action-btn" onclick="shareApp()">
+                                <span class="action-icon">📤</span>
+                                <span>Share App</span>
+                            </a>
+                            <a href="#" class="action-btn" onclick="showPage('analytics')">
+                                <span class="action-icon">📊</span>
+                                <span>View Analytics</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="campaigns-section">
+                        <h3 class="section-title">Recent Campaigns</h3>
+                        <div id="recentCampaigns">
+                            <!-- Sample campaigns -->
+                            <div class="campaign-card" onclick="openCampaign(1)">
+                                <div class="campaign-image">
+                                    <span class="campaign-category">Medical</span>
+                                    🏥
+                                </div>
+                                <div class="campaign-content">
+                                    <h4 class="campaign-title">Help Rahul Fight Cancer</h4>
+                                    <p class="campaign-description">Supporting a young boy's battle against leukemia. Every contribution makes a difference.</p>
+                                    <div class="campaign-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 65%"></div>
+                                        </div>
+                                        <div class="campaign-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">₹3.25L</div>
+                                                <div class="stat-item-label">Raised</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">₹5L</div>
+                                                <div class="stat-item-label">Goal</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">156</div>
+                                                <div class="stat-item-label">Donors</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="campaign-card" onclick="openCampaign(2)">
+                                <div class="campaign-image">
+                                    <span class="campaign-category">Education</span>
+                                    🎓
+                                </div>
+                                <div class="campaign-content">
+                                    <h4 class="campaign-title">Education for Rural Children</h4>
+                                    <p class="campaign-description">Building a school in a remote village to provide quality education.</p>
+                                    <div class="campaign-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 56%"></div>
+                                        </div>
+                                        <div class="campaign-stats">
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">₹4.2L</div>
+                                                <div class="stat-item-label">Raised</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">₹7.5L</div>
+                                                <div class="stat-item-label">Goal</div>
+                                            </div>
+                                            <div class="stat-item">
+                                                <div class="stat-item-value">89</div>
+                                                <div class="stat-item-label">Donors</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Campaigns -->
+            <div id="campaignsPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">My Campaigns</h2>
+                    <div id="myCampaignsList">
+                        <div class="campaign-card">
+                            <div class="campaign-image">
+                                <span class="campaign-category">Medical</span>
+                                🏥
+                            </div>
+                            <div class="campaign-content">
+                                <h4 class="campaign-title">Help Rahul Fight Cancer</h4>
+                                <p class="campaign-description">Active campaign with great progress and community support.</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <div class="campaign-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹3.25L</div>
+                                            <div class="stat-item-label">Raised</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹5L</div>
+                                            <div class="stat-item-label">Goal</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">23</div>
+                                            <div class="stat-item-label">Days Left</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                                    <button class="btn btn-primary" style="flex: 1;" onclick="editCampaign(1)">Edit</button>
+                                    <button class="btn btn-outline" style="flex: 1;" onclick="shareCampaign(1)">Share</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discover -->
+            <div id="discoverPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">Discover Campaigns</h2>
+                    
+                    <!-- Search Bar -->
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search campaigns..." id="searchInput">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                        <button class="btn btn-outline" style="white-space: nowrap;" onclick="filterCategory('all')">All</button>
+                        <button class="btn btn-outline" style="white-space: nowrap;" onclick="filterCategory('medical')">🏥 Medical</button>
+                        <button class="btn btn-outline" style="white-space: nowrap;" onclick="filterCategory('education')">🎓 Education</button>
+                        <button class="btn btn-outline" style="white-space: nowrap;" onclick="filterCategory('emergency')">🚨 Emergency</button>
+                    </div>
+
+                    <!-- Campaign Grid -->
+                    <div id="discoverCampaigns">
+                        <div class="campaign-card" onclick="openCampaign(3)">
+                            <div class="campaign-image">
+                                <span class="campaign-category">Emergency</span>
+                                🚨
+                            </div>
+                            <div class="campaign-content">
+                                <h4 class="campaign-title">Flood Relief Kerala</h4>
+                                <p class="campaign-description">Emergency relief for families affected by recent floods.</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 89%"></div>
+                                    </div>
+                                    <div class="campaign-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹8.9L</div>
+                                            <div class="stat-item-label">Raised</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹10L</div>
+                                            <div class="stat-item-label">Goal</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">245</div>
+                                            <div class="stat-item-label">Donors</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success btn-block" style="margin-top: 1rem;" onclick="donateToCampaign(3, event)">Donate Now</button>
+                            </div>
+                        </div>
+
+                        <div class="campaign-card" onclick="openCampaign(4)">
+                            <div class="campaign-image">
+                                <span class="campaign-category">Creative</span>
+                                🎨
+                            </div>
+                            <div class="campaign-content">
+                                <h4 class="campaign-title">Independent Film Project</h4>
+                                <p class="campaign-description">Supporting an independent filmmaker's documentary.</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 62%"></div>
+                                    </div>
+                                    <div class="campaign-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹1.85L</div>
+                                            <div class="stat-item-label">Raised</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">₹3L</div>
+                                            <div class="stat-item-label">Goal</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-item-value">67</div>
+                                            <div class="stat-item-label">Donors</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success btn-block" style="margin-top: 1rem;" onclick="donateToCampaign(4, event)">Donate Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Campaign -->
+            <div id="createPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">Create New Campaign</h2>
+                    <form onsubmit="createCampaign(event)">
+                        <div class="form-group">
+                            <label class="form-label">Campaign Title</label>
+                            <input type="text" class="form-control" placeholder="Enter a compelling title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="medical">🏥 Medical & Health</option>
+                                <option value="education">🎓 Education</option>
+                                <option value="emergency">🚨 Emergency</option>
+                                <option value="creative">🎨 Creative</option>
+                                <option value="social">🤝 Social Cause</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Funding Goal (₹)</label>
+                            <input type="number" class="form-control" placeholder="50000" min="1000" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="4" placeholder="Tell your story..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Campaign Duration</label>
+                            <select class="form-control" required>
+                                <option value="30">30 Days</option>
+                                <option value="60" selected>60 Days</option>
+                                <option value="90">90 Days</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Create Campaign</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Donations -->
+            <div id="donationsPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">My Donations</h2>
+                    <div style="background: white; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--dark-color);">Help Rahul Fight Cancer</h4>
+                                <p style="color: #666; font-size: 0.9rem; margin: 0;">Donated on July 25, 2024</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--success-color);">₹5,000</div>
+                                <div style="font-size: 0.8rem; color: #666;">Completed</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" style="width: 100%;" onclick="downloadReceipt(1)">Download Receipt</button>
+                    </div>
+
+                    <div style="background: white; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--dark-color);">Education for Rural Children</h4>
+                                <p style="color: #666; font-size: 0.9rem; margin: 0;">Donated on July 20, 2024</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--success-color);">₹2,500</div>
+                                <div style="font-size: 0.8rem; color: #666;">Completed</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" style="width: 100%;" onclick="downloadReceipt(2)">Download Receipt</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div id="analyticsPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">Analytics Dashboard</h2>
+                    
+                    <div style="background: var(--gradient-primary); color: white; padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; text-align: center;">
+                        <h3 style="margin-bottom: 0.5rem;">Campaign Performance</h3>
+                        <p style="opacity: 0.9; margin: 0;">AI-powered insights for your campaigns</p>
+                    </div>
+
+                    <div class="quick-stats" style="margin-bottom: 1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-value">+23%</div>
+                            <div class="stat-label">Growth Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-value">87%</div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏰</div>
+                            <div class="stat-value">7:30 PM</div>
+                            <div class="stat-label">Peak Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔄</div>
+                            <div class="stat-value">73%</div>
+                            <div class="stat-label">Retention</div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 15px; padding: 1.5rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">🧠 AI Recommendations</h4>
+                        <div style="background: rgba(39, 174, 96, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                            <h5 style="color: var(--success-color); margin-bottom: 0.5rem;">Optimal Posting Time</h5>
+                            <p style="margin: 0; font-size: 0.9rem;">Post updates at 7:30 PM for maximum engagement (+34% increase)</p>
+                        </div>
+                        <div style="background: rgba(243, 156, 18, 0.1); padding: 1rem; border-radius: 10px;">
+                            <h5 style="color: var(--warning-color); margin-bottom: 0.5rem;">Image Optimization</h5>
+                            <p style="margin: 0; font-size: 0.9rem;">Add more personal photos to increase trust by 28%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div id="settingsPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">Settings</h2>
+                    
+                    <div style="background: white; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">Account</h4>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="Demo User">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="demo@ketto.com">
+                        </div>
+                        <button class="btn btn-primary btn-block">Update Profile</button>
+                    </div>
+
+                    <div style="background: white; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">Preferences</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span>Push Notifications</span>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span>Email Updates</span>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Dark Mode</span>
+                            <input type="checkbox" onchange="toggleDarkMode()">
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 15px; padding: 1rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">App Info</h4>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Version</span>
+                            <span>1.0.0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span>Last Updated</span>
+                            <span>July 29, 2024</span>
+                        </div>
+                        <button class="btn btn-outline btn-block" onclick="clearCache()">Clear Cache</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help -->
+            <div id="helpPage" class="page">
+                <div class="form-container">
+                    <h2 class="section-title">Help & Support</h2>
+                    
+                    <div style="background: white; border-radius: 15px; padding: 1rem; margin-bottom: 1rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">Frequently Asked Questions</h4>
+                        
+                        <div style="border-bottom: 1px solid var(--border-color); padding: 1rem 0;" onclick="toggleFAQ(1)">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600;">How do I create a campaign?</span>
+                                <span>▼</span>
+                            </div>
+                            <div id="faq1" style="display: none; margin-top: 1rem; color: #666;">
+                                Tap the "Create Campaign" button on the home screen, fill in your campaign details, and submit for review.
+                            </div>
+                        </div>
+
+                        <div style="border-bottom: 1px solid var(--border-color); padding: 1rem 0;" onclick="toggleFAQ(2)">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600;">How long does campaign approval take?</span>
+                                <span>▼</span>
+                            </div>
+                            <div id="faq2" style="display: none; margin-top: 1rem; color: #666;">
+                                Most campaigns are reviewed and approved within 24-48 hours of submission.
+                            </div>
+                        </div>
+
+                        <div style="padding: 1rem 0;" onclick="toggleFAQ(3)">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600;">What payment methods are supported?</span>
+                                <span>▼</span>
+                            </div>
+                            <div id="faq3" style="display: none; margin-top: 1rem; color: #666;">
+                                We support credit/debit cards, UPI, net banking, and digital wallets for donations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 15px; padding: 1rem; box-shadow: var(--shadow);">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark-color);">Contact Support</h4>
+                        <button class="btn btn-primary btn-block" style="margin-bottom: 0.5rem;" onclick="contactSupport('chat')">💬 Live Chat</button>
+                        <button class="btn btn-outline btn-block" style="margin-bottom: 0.5rem;" onclick="contactSupport('email')">📧 Email Support</button>
+                        <button class="btn btn-outline btn-block" onclick="contactSupport('phone')">📞 Call Support</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Notification Panel -->
+        <div class="notification-panel" id="notificationPanel">
+            <div class="notification-header">
+                <button class="back-btn" onclick="closeNotifications()">←</button>
+                <h3>Notifications</h3>
+                <div></div>
+            </div>
+            <div style="padding: 1rem;">
+                <div class="notification-item">
+                    <div class="notification-icon">🎉</div>
+                    <div class="notification-content">
+                        <div class="notification-title">Campaign Milestone Reached!</div>
+                        <div class="notification-text">Your campaign "Help Rahul Fight Cancer" has reached 60% of its goal!</div>
+                        <div class="notification-time">2 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <div class="notification-icon">💰</div>
+                    <div class="notification-content">
+                        <div class="notification-title">New Donation Received</div>
+                        <div class="notification-text">Someone donated ₹2,500 to your education campaign</div>
+                        <div class="notification-time">5 hours ago</div>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <div class="notification-icon">📊</div>
+                    <div class="notification-content">
+                        <div class="notification-title">Weekly Report Available</div>
+                        <div class="notification-text">Your campaign performance report for this week is ready</div>
+                        <div class="notification-time">1 day ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-tab active" onclick="showPage('home')">
+                <span class="nav-tab-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="showPage('discover')">
+                <span class="nav-tab-icon">🔍</span>
+                <span>Discover</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="showPage('create')">
+                <span class="nav-tab-icon">➕</span>
+                <span>Create</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="showPage('campaigns')">
+                <span class="nav-tab-icon">🎯</span>
+                <span>Campaigns</span>
+            </a>
+            <a href="#" class="nav-tab" onclick="showPage('analytics')">
+                <span class="nav-tab-icon">📊</span>
+                <span>Analytics</span>
+            </a>
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto Mobile - Crowdfunding App</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Ketto">
+    <meta name="apple-mobile-web-app-title" content="Ketto">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#e74c3c">
+    <meta name="msapplication-TileColor" content="#e74c3c">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIktldHRvIC0gQ3Jvd2RmdW5kaW5nIEFwcCIsCiAgInNob3J0X25hbWUiOiAiS2V0dG8iLAogICJkZXNjcmlwdGlvbiI6ICJGdW5kIGRyZWFtcywgY2hhbmdlIGxpdmVzIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNlY2YwZjEiLAogICJ0aGVtZV9jb2xvciI6ICIjZTc0YzNjIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTWpRaUlHaGxhV2RvZEQwaU1qUWlJSFpwWlhkQ2IzZzlJakFnTUNBeU5DQXlOQ0lnZUcxc2JuTTlJbWgwZEhBNkx5OTNkM2N1ZHpNdWIzSm5Mekl3TURBdmMzWm5JajRLSUNBOGNtVmpkQ0IzYVdSMGFEMGlNalFpSUdobGFXZG9kRDBpTWpRaUlHWnBiR3c5SWlObE56UmpNMk1pTHo0S1BDOXpkbWMrIiwKICAgICAgInNpemVzIjogIjI0eDI0IiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTlRFeUlHaGxhV2RvZEQwaU5URXlJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpUGdvZ0lEeGpaV2x5WTJ4bElHTjRQU0l5TlRZaUlHTjVQU0l5TlRZaUlISTlJakUyTUNJZ1ptbHNiRDBpSXpVMk1qWXhJaUF2UGdvZ0lEeDBaWGgwSUhnOUlqSTFOaUlnZVQwaU1qVTJJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsUDBrZ1ptbHNiRDBpSTJabVptWm1abVlpSUdadmJuUXRjMmw2WlQwaU5qQWlQa3M4TDNSbGVIUStDaUE4TDNOMlp6ND0iLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --info-color: #17a2b8;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 8px 25px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-color);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-top: var(--safe-area-inset-top);
+            padding-bottom: var(--safe-area-inset-bottom);
+        }
+
+        /* Mobile-First Design */
+        .mobile-container {
+            max-width: 100%;
+            min-height: 100vh;
+            background: white;
+            position: relative;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .menu-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .app-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .notification-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0.2rem;
+            right: 0.2rem;
+            background: var(--error-color);
+            color: white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--shadow-hover);
+            transition: transform 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .side-nav.active {
+            transform: translateX(280px);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 150;
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .nav-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-user-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-user-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: background 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-item:active,
+        .nav-item.active {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 70px);
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Home/Dashboard */
+        .dashboard {
+            padding: 1rem;
+        }
+
+        .welcome-card {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .quick-actions {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .action-icon {
+            font-size: 1.8rem;
+        }
+
+        /* Campaign Cards */
+        .campaigns-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .campaign-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .campaign-card:active {
+            transform: scale(0.98);
+        }
+
+        .campaign-image {
+            height: 150px;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        .campaign-category {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .campaign-content {
+            padding: 1rem;
+        }
+
+        .campaign-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .campaign-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .campaign-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .campaign-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item-value {
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .stat-item-label {
+            color: #666;
+        }
+
+        /* Forms */
+        .form-container {
+            padding: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 48px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            z-index: 100;
+            padding-bottom: calc(0.5rem + var(--safe-area-inset-bottom));
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 60px;
+        }
+
+        .nav-tab.active {
+            color: var(--primary-color);
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.95);
+        }
+
+        .nav-tab-icon {
+            font-size: 1.3rem;
+        }
+
+        /* PWA Install Banner */
+        .install-banner {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 15px;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        .install-content {
+            flex: 1;
+        }
+
+        .install-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .install-subtitle {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .install-btn {
+            background: white;
+            color: var(--secondary-color);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .close-banner {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Offline Indicator */
+        .offline-banner {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .offline-banner.show {
+            display: block;
+        }
+
+        /* Notifications */
+        .notification-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            box-shadow: var(--shadow-hover);
+            transition: transform 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .notification-panel.active {
+            transform: translateX(-100%);
+        }
+
+        .notification-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-text {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            color: #999;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Messages */
+        .toast {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: var(--dark-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: var(--success-color);
+        }
+
+        .toast.error {
+            background: var(--error-color);
+        }
+
+        .toast.warning {
+            background: var(--warning-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-color: #ffffff;
+                --light-color: #1a1a1a;
+                --border-color: #333333;
+            }
+            
+            body {
+                background: #1a1a1a;
+                color: white;
+            }
+            
+            .mobile-container {
+                background: #1a1a1a;
+            }
+            
+            .stat-card,
+            .campaign-card,
+            .action-btn,
+            .form-control,
+            .bottom-nav,
+            .side-nav {
+                background: #2d2d2d;
+                color: white;
+                border-color: #333333;
+            }
+        }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 414px;
+                margin: 0 auto;
+                box-shadow: var(--shadow-hover);
+            }
+            
+            .quick-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2) {
+            .campaign-image,
+            .stat-icon,
+            .action-icon {
+                -webkit-font-smoothing: antialiased;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus Management */
+        .nav-item:focus,
+        .nav-tab:focus,
+        .btn:focus,
+        .form-control:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Pull to Refresh */
+        .pull-refresh {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem;
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .pull-refresh.show {
+            top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Offline Banner -->
+        <div class="offline-banner" id="offlineBanner">
+            📱 You're offline. Some features may be limited.
+        </div>
+
+        <!-- PWA Install Banner -->
+        <div class="install-banner" id="installBanner">
+            <div class="install-content">
+                <div class="install-title">Install Ketto App</div>
+                <div class="install-subtitle">Get instant access and offline features</div>
+            </div>
+            <button class="install-btn" onclick="installPWA()">Install</button>
+            <button class="close-banner" onclick="dismissInstallBanner()">×</button>
+        </div>
+
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="header-left">
+                <button class="menu-btn" onclick="toggleSideNav()">☰</button>
+                <div class="app-logo">Ketto</div>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn" onclick="openNotifications()">
+                    🔔
+                    <span class="notification-badge"></span>
+                </button>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </header>
+
+        <!-- Side Navigation -->
+        <div class="nav-overlay" id="navOverlay" onclick="closeSideNav()"></div>
+        <nav class="side-nav" id="sideNav">
+            <div class="nav-header">
+                <div class="nav-avatar" id="navAvatar">U</div>
+                <div class="nav-user-info">
+                    <h3 id="navUserName">Demo User</h3>
+                    <p

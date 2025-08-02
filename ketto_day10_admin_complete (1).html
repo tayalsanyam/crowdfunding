@@ -1,0 +1,2025 @@
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>User</th>
+                                    <th>Campaign</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTableBody">
+                                <!-- Transaction rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Platform Analytics</h1>
+                        <p class="dashboard-subtitle">Deep insights into platform performance and user behavior</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Conversion Rate</div>
+                                <div class="stat-icon">🎯</div>
+                            </div>
+                            <div class="stat-value">4.2%</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +0.8% this month
+                            </div>
+                        </div>
+
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <div class="stat-title">Avg. Donation</div>
+                                <div class="stat-icon success">💝</div>
+                            </div>
+                            <div class="stat-value">₹2,847</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +₹247 increase
+                            </div>
+                        </div>
+
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <div class="stat-title">Page Views</div>
+                                <div class="stat-icon warning">👁️</div>
+                            </div>
+                            <div class="stat-value">1.2M</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +15% this week
+                            </div>
+                        </div>
+
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <div class="stat-title">User Retention</div>
+                                <div class="stat-icon info">🔄</div>
+                            </div>
+                            <div class="stat-value">68.3%</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +3.2% improvement
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">User Growth Analytics</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                📈 User Growth Trends
+                                <br><small>New registrations vs. active users</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Campaign Performance</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                📊 Success Rate by Category
+                                <br><small>Campaign completion statistics</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reportsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Reports & Insights</h1>
+                        <p class="dashboard-subtitle">Generate comprehensive reports for stakeholders</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card" onclick="generateFinancialReport()">
+                            <div class="stat-header">
+                                <div class="stat-title">Financial Report</div>
+                                <div class="stat-icon">💰</div>
+                            </div>
+                            <div class="stat-value">Monthly</div>
+                            <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                                Revenue, expenses, and profit analysis
+                            </div>
+                        </div>
+
+                        <div class="stat-card success" onclick="generateUserReport()">
+                            <div class="stat-header">
+                                <div class="stat-title">User Engagement</div>
+                                <div class="stat-icon success">👥</div>
+                            </div>
+                            <div class="stat-value">Weekly</div>
+                            <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                                User activity and retention metrics
+                            </div>
+                        </div>
+
+                        <div class="stat-card warning" onclick="generateCampaignReport()">
+                            <div class="stat-header">
+                                <div class="stat-title">Campaign Performance</div>
+                                <div class="stat-icon warning">🎯</div>
+                            </div>
+                            <div class="stat-value">Quarterly</div>
+                            <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                                Success rates and trending categories
+                            </div>
+                        </div>
+
+                        <div class="stat-card info" onclick="generateSystemReport()">
+                            <div class="stat-header">
+                                <div class="stat-title">Platform Health</div>
+                                <div class="stat-icon info">🔧</div>
+                            </div>
+                            <div class="stat-value">Daily</div>
+                            <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                                System performance and reliability
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settingsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Platform Settings</h1>
+                        <p class="dashboard-subtitle">Configure platform behavior and policies</p>
+                    </div>
+
+                    <div class="admin-table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">General Settings</h3>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Platform Name</label>
+                                <input type="text" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px;" value="Ketto Crowdfunding Platform">
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Platform Fee (%)</label>
+                                <input type="number" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px;" value="5" step="0.1">
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Minimum Campaign Goal</label>
+                                <input type="number" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px;" value="1000">
+                            </div>
+
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Max Campaign Duration (days)</label>
+                                <input type="number" style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px;" value="90">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
+                            <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+                            <button class="btn btn-outline" onclick="resetSettings()">🔄 Reset to Default</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Page -->
+                <div id="securityPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Security & Compliance</h1>
+                        <p class="dashboard-subtitle">Monitor security events and manage platform safety</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Security Score</div>
+                                <div class="stat-icon">🛡️</div>
+                            </div>
+                            <div class="stat-value">98.5%</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                Excellent security
+                            </div>
+                        </div>
+
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <div class="stat-title">Failed Logins</div>
+                                <div class="stat-icon warning">⚠️</div>
+                            </div>
+                            <div class="stat-value">23</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                Last 24 hours
+                            </div>
+                        </div>
+
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <div class="stat-title">Verified Users</div>
+                                <div class="stat-icon success">✅</div>
+                            </div>
+                            <div class="stat-value">89.2%</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +2.1% this week
+                            </div>
+                        </div>
+
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <div class="stat-title">Active Sessions</div>
+                                <div class="stat-icon info">👤</div>
+                            </div>
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                Currently online
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Security Events</h3>
+                        </div>
+                        <div class="activity-list" id="securityActivityList">
+                            <!-- Security events will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Admin Application State
+        let adminData = {
+            users: [],
+            campaigns: [],
+            transactions: [],
+            currentPage: 'dashboard'
+        };
+
+        // Initialize Admin Panel
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdminData();
+            updateDashboardStats();
+            loadRecentActivity();
+            loadSecurityEvents();
+            
+            // Start real-time updates
+            setInterval(updateRealTimeStats, 5000);
+            setInterval(updateBadges, 10000);
+        });
+
+        // Initialize Demo Data
+        function initializeAdminData() {
+            // Sample users
+            adminData.users = [
+                {
+                    id: 1,
+                    name: 'Rajesh Kumar',
+                    email: 'rajesh@email.com',
+                    joined: '2024-01-15',
+                    campaigns: 3,
+                    donations: 12,
+                    status: 'active',
+                    totalDonated: 45000
+                },
+                {
+                    id: 2,
+                    name: 'Priya Sharma',
+                    email: 'priya@email.com',
+                    joined: '2024-02-22',
+                    campaigns: 1,
+                    donations: 8,
+                    status: 'active',
+                    totalDonated: 22000
+                },
+                {
+                    id: 3,
+                    name: 'Amit Patel',
+                    email: 'amit@email.com',
+                    joined: '2024-03-10',
+                    campaigns: 0,
+                    donations: 25,
+                    status: 'suspended',
+                    totalDonated: 75000
+                },
+                {
+                    id: 4,
+                    name: 'Sneha Reddy',
+                    email: 'sneha@email.com',
+                    joined: '2024-04-05',
+                    campaigns: 2,
+                    donations: 6,
+                    status: 'pending',
+                    totalDonated: 18000
+                },
+                {
+                    id: 5,
+                    name: 'Vikram Singh',
+                    email: 'vikram@email.com',
+                    joined: '2024-05-18',
+                    campaigns: 5,
+                    donations: 15,
+                    status: 'active',
+                    totalDonated: 95000
+                }
+            ];
+
+            // Sample campaigns
+            adminData.campaigns = [
+                {
+                    id: 1,
+                    title: 'Help Rahul Fight Cancer',
+                    creator: 'Rajesh Kumar',
+                    category: 'Medical',
+                    goal: 500000,
+                    raised: 347500,
+                    status: 'active',
+                    created: '2024-06-15'
+                },
+                {
+                    id: 2,
+                    title: 'Education for Rural Children',
+                    creator: 'Priya Sharma',
+                    category: 'Education',
+                    goal: 250000,
+                    raised: 187500,
+                    status: 'active',
+                    created: '2024-06-20'
+                },
+                {
+                    id: 3,
+                    title: 'Flood Relief Kerala',
+                    creator: 'Amit Patel',
+                    category: 'Emergency',
+                    goal: 1000000,
+                    raised: 850000,
+                    status: 'completed',
+                    created: '2024-05-10'
+                }
+            ];
+
+            // Sample transactions
+            adminData.transactions = [
+                {
+                    id: 'TXN001',
+                    user: 'Rajesh Kumar',
+                    campaign: 'Help Rahul Fight Cancer',
+                    amount: 5000,
+                    date: '2024-07-28',
+                    status: 'completed'
+                },
+                {
+                    id: 'TXN002',
+                    user: 'Priya Sharma',
+                    campaign: 'Education for Rural Children',
+                    amount: 2500,
+                    date: '2024-07-28',
+                    status: 'completed'
+                },
+                {
+                    id: 'TXN003',
+                    user: 'Amit Patel',
+                    campaign: 'Flood Relief Kerala',
+                    amount: 10000,
+                    date: '2024-07-27',
+                    status: 'pending'
+                }
+            ];
+        }
+
+        // Page Navigation
+        function showAdminPage(pageId) {
+            // Update navigation
+            document.querySelectorAll('.admin-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.admin-page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                adminData.currentPage = pageId;
+
+                // Load page-specific data
+                switch(pageId) {
+                    case 'users':
+                        loadUsersData();
+                        break;
+                    case 'campaigns':
+                        loadCampaignsData();
+                        break;
+                    case 'transactions':
+                        loadTransactionsData();
+                        break;
+                    case 'security':
+                        loadSecurityEvents();
+                        break;
+                }
+            }
+        }
+
+        // Dashboard Functions
+        function updateDashboardStats() {
+            const stats = {
+                totalRevenue: 2450000 + Math.floor(Math.random() * 10000),
+                activeUsers: 24387 + Math.floor(Math.random() * 100),
+                liveCampaigns: 1847 + Math.floor(Math.random() * 10),
+                successRate: (73.8 + (Math.random() - 0.5) * 2).toFixed(1)
+            };
+
+            document.getElementById('totalRevenue').textContent = '₹' + (stats.totalRevenue / 100000).toFixed(2) + 'M';
+            document.getElementById('activeUsers').textContent = stats.activeUsers.toLocaleString();
+            document.getElementById('liveCampaigns').textContent = stats.liveCampaigns.toLocaleString();
+            document.getElementById('successRate').textContent = stats.successRate + '%';
+        }
+
+        function updateRealTimeStats() {
+            if (adminData.currentPage === 'dashboard') {
+                updateDashboardStats();
+            }
+        }
+
+        function loadRecentActivity() {
+            const activities = [
+                {
+                    icon: '👤',
+                    text: 'New user registration: Arjun Mehta',
+                    time: '2 minutes ago'
+                },
+                {
+                    icon: '🎯',
+                    text: 'Campaign approved: Medical Emergency Fund',
+                    time: '15 minutes ago'
+                },
+                {
+                    icon: '💰',
+                    text: 'Large donation received: ₹25,000',
+                    time: '32 minutes ago'
+                },
+                {
+                    icon: '⚠️',
+                    text: 'Failed payment attempt detected',
+                    time: '1 hour ago'
+                },
+                {
+                    icon: '✅',
+                    text: 'User verification completed: Kavya Sharma',
+                    time: '2 hours ago'
+                }
+            ];
+
+            const activityList = document.getElementById('recentActivityList');
+            if (activityList) {
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">${activity.icon}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${activity.text}</div>
+                            <div class="activity-time">🕒 ${activity.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function loadSecurityEvents() {
+            const securityEvents = [
+                {
+                    icon: '🛡️',
+                    text: 'Security scan completed - No threats detected',
+                    time: '1 hour ago'
+                },
+                {
+                    icon: '⚠️',
+                    text: 'Multiple failed login attempts from IP 192.168.1.100',
+                    time: '3 hours ago'
+                },
+                {
+                    icon: '🔒',
+                    text: 'SSL certificate renewed successfully',
+                    time: '1 day ago'
+                },
+                {
+                    icon: '🚫',
+                    text: 'Suspicious activity detected - Account locked',
+                    time: '2 days ago'
+                }
+            ];
+
+            const securityList = document.getElementById('securityActivityList');
+            if (securityList) {
+                securityList.innerHTML = securityEvents.map(event => `
+                    <div class="activity-item">
+                        <div class="activity-icon">${event.icon}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">${event.text}</div>
+                            <div class="activity-time">🕒 ${event.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Data Loading Functions
+        function loadUsersData() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = adminData.users.map(user => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="table-avatar">${user.name.charAt(0)}</div>
+                            <div>
+                                <div style="font-weight: 600;">${user.name}</div>
+                                <div style="font-size: 0.8rem; color: #666;">ID: ${user.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>${new Date(user.joined).toLocaleDateString()}</td>
+                    <td>${user.campaigns}</td>
+                    <td>₹${user.totalDonated.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge status-${user.status}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn view" onclick="viewUser(${user.id})" title="View Details">👁️</button>
+                        <button class="action-btn edit" onclick="editUser(${user.id})" title="Edit User">✏️</button>
+                        <button class="action-btn delete" onclick="deleteUser(${user.id})" title="Delete User">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadCampaignsData() {
+            const tbody = document.getElementById('campaignsTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = adminData.campaigns.map(campaign => `
+                <tr>
+                    <td>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">${campaign.title}</div>
+                            <div style="font-size: 0.8rem; color: #666;">ID: ${campaign.id}</div>
+                        </div>
+                    </td>
+                    <td>${campaign.creator}</td>
+                    <td>
+                        <span style="background: rgba(52, 152, 219, 0.1); color: var(--secondary-color); padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">
+                            ${campaign.category}
+                        </span>
+                    </td>
+                    <td>₹${campaign.goal.toLocaleString()}</td>
+                    <td>₹${campaign.raised.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge status-${campaign.status}">
+                            ${campaign.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn view" onclick="viewCampaign(${campaign.id})" title="View Campaign">👁️</button>
+                        <button class="action-btn edit" onclick="editCampaign(${campaign.id})" title="Edit Campaign">✏️</button>
+                        <button class="action-btn delete" onclick="deleteCampaign(${campaign.id})" title="Delete Campaign">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadTransactionsData() {
+            const tbody = document.getElementById('transactionsTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = adminData.transactions.map(transaction => `
+                <tr>
+                    <td style="font-family: monospace; font-weight: 600;">${transaction.id}</td>
+                    <td>${transaction.user}</td>
+                    <td>
+                        <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${transaction.campaign}">
+                            ${transaction.campaign}
+                        </div>
+                    </td>
+                    <td style="font-weight: 600; color: var(--success-color);">₹${transaction.amount.toLocaleString()}</td>
+                    <td>${new Date(transaction.date).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge status-${transaction.status}">
+                            ${transaction.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn view" onclick="viewTransaction('${transaction.id}')" title="View Transaction">👁️</button>
+                        <button class="action-btn edit" onclick="refundTransaction('${transaction.id}')" title="Process Refund">↩️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Action Functions
+        function viewUser(userId) {
+            const user = adminData.users.find(u => u.id === userId);
+            if (user) {
+                showToast('User Details', `Viewing details for ${user.name}`, 'info');
+            }
+        }
+
+        function editUser(userId) {
+            showToast('Edit User', `Edit functionality for user ${userId}`, 'info');
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                adminData.users = adminData.users.filter(u => u.id !== userId);
+                loadUsersData();
+                showToast('Success', 'User deleted successfully!', 'success');
+            }
+        }
+
+        function viewCampaign(campaignId) {
+            const campaign = adminData.campaigns.find(c => c.id === campaignId);
+            if (campaign) {
+                showToast('Campaign Details', `Viewing ${campaign.title}`, 'info');
+            }
+        }
+
+        function editCampaign(campaignId) {
+            showToast('Edit Campaign', `Edit functionality for campaign ${campaignId}`, 'info');
+        }
+
+        function deleteCampaign(campaignId) {
+            if (confirm('Are you sure you want to delete this campaign?')) {
+                adminData.campaigns = adminData.campaigns.filter(c => c.id !== campaignId);
+                loadCampaignsData();
+                showToast('Success', 'Campaign deleted successfully!', 'success');
+            }
+        }
+
+        function viewTransaction(transactionId) {
+            showToast('Transaction Details', `Viewing transaction ${transactionId}`, 'info');
+        }
+
+        function refundTransaction(transactionId) {
+            if (confirm('Are you sure you want to process a refund for this transaction?')) {
+                showToast('Success', 'Refund processed successfully!', 'success');
+            }
+        }
+
+        // Utility Functions
+        function addUser() {
+            showToast('Add User', 'Add user functionality would open here', 'info');
+        }
+
+        function exportUsers() {
+            showToast('Export', 'Users data exported to CSV', 'success');
+        }
+
+        function exportCampaigns() {
+            showToast('Export', 'Campaigns data exported to CSV', 'success');
+        }
+
+        function exportTransactions() {
+            showToast('Export', 'Transactions data exported to CSV', 'success');
+        }
+
+        function reviewPendingCampaigns() {
+            showToast('Review', 'Pending campaigns review interface', 'info');
+        }
+
+        function generateFinancialReport() {
+            showToast('Report', 'Generating financial report...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'Financial report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function generateUserReport() {
+            showToast('Report', 'Generating user engagement report...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'User report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function generateCampaignReport() {
+            showToast('Report', 'Generating campaign performance report...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'Campaign report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function generateSystemReport() {
+            showToast('Report', 'Generating system health report...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'System report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function saveSettings() {
+            showToast('Settings', 'Saving settings...', 'info');
+            setTimeout(() => {
+                showToast('Success', 'Settings saved successfully!', 'success');
+            }, 1500);
+        }
+
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default?')) {
+                showToast('Settings', 'Settings reset to default values', 'warning');
+            }
+        }
+
+        function showAdminMenu() {
+            showToast('Menu', 'Admin menu functionality', 'info');
+        }
+
+        // Update badges periodically
+        function updateBadges() {
+            document.getElementById('usersBadge').textContent = (1247 + Math.floor(Math.random() * 10)).toLocaleString();
+            document.getElementById('campaignsBadge').textContent = (342 + Math.floor(Math.random() * 5)).toString();
+            document.getElementById('transactionsBadge').textContent = (8924 + Math.floor(Math.random() * 50)).toLocaleString();
+            document.getElementById('securityBadge').textContent = Math.floor(Math.random() * 5) + 1;
+        }
+
+        // Toast Notification System
+        function showToast(title, message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <div style="font-size: 1.2rem;">${icons[type]}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; margin-bottom: 0.25rem;">${title}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">${message}</div>
+                </div>
+                <button class="toast-close" onclick="closeToast(this)">×</button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function closeToast(button) {
+            const toast = button.parentElement;
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // Search functionality
+        document.getElementById('adminSearchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm.length > 2) {
+                performAdminSearch(searchTerm);
+            }
+        });
+
+        function performAdminSearch(term) {
+            const results = {
+                users: adminData.users.filter(user => 
+                    user.name.toLowerCase().includes(term) || 
+                    user.email.toLowerCase().includes(term)
+                ),
+                campaigns: adminData.campaigns.filter(campaign => 
+                    campaign.title.toLowerCase().includes(term) || 
+                    campaign.creator.toLowerCase().includes(term)
+                ),
+                transactions: adminData.transactions.filter(transaction => 
+                    transaction.id.toLowerCase().includes(term) || 
+                    transaction.user.toLowerCase().includes(term)
+                )
+            };
+
+            const totalResults = results.users.length + results.campaigns.length + results.transactions.length;
+            if (totalResults > 0) {
+                showToast('Search Results', `Found ${totalResults} results for "${term}"`, 'info');
+            } else {
+                showToast('No Results', `No results found for "${term}"`, 'warning');
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl/Cmd + F to focus search
+            if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+                event.preventDefault();
+                document.getElementById('adminSearchInput').focus();
+            }
+        });
+
+        // Mobile menu toggle (for responsive design)
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
+        // Handle window resize for responsive behavior
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('adminSidebar');
+                if (sidebar && !sidebar.classList.contains('mobile-open')) {
+                    // Hide sidebar on mobile unless explicitly opened
+                }
+            }
+        });
+
+        // Auto-refresh demo data
+        setInterval(() => {
+            // Add some random activity
+            if (Math.random() > 0.8) {
+                const activities = [
+                    'New user registered',
+                    'Campaign approved',
+                    'Large donation received',
+                    'Security scan completed'
+                ];
+                const activity = activities[Math.floor(Math.random() * activities.length)];
+                // Don't actually update - just simulate background activity
+            }
+        }, 15000);
+
+        // Initialize welcome message
+        setTimeout(() => {
+            showToast('Welcome', 'Admin panel loaded successfully!', 'success');
+        }, 1000);
+
+        // Performance monitoring
+        function checkSystemHealth() {
+            const healthMetrics = {
+                cpu: Math.random() * 20 + 70, // 70-90%
+                memory: Math.random() * 15 + 75, // 75-90%
+                disk: Math.random() * 10 + 85, // 85-95%
+                network: Math.random() * 5 + 95 // 95-100%
+            };
+
+            // Log health metrics (in a real system, this would send to monitoring service)
+            console.log('System Health Check:', healthMetrics);
+        }
+
+        // Run system health check every 5 minutes
+        setInterval(checkSystemHealth, 300000);
+
+        // Export functionality
+        function exportToCSV(data, filename) {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + data.map(row => Object.values(row).join(",")).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Batch operations
+        function performBatchOperation(operation, items) {
+            showToast('Batch Operation', `Performing ${operation} on ${items.length} items`, 'info');
+            
+            setTimeout(() => {
+                showToast('Success', `Batch ${operation} completed successfully!`, 'success');
+            }, 2000);
+        }
+
+        // Data validation
+        function validateAdminInput(input, type) {
+            switch(type) {
+                case 'email':
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+                case 'phone':
+                    return /^[\+]?[1-9][\d]{0,15}$/.test(input);
+                case 'number':
+                    return !isNaN(input) && isFinite(input);
+                default:
+                    return input && input.trim().length > 0;
+            }
+        }
+
+        // Audit logging
+        function logAdminAction(action, details) {
+            const logEntry = {
+                timestamp: new Date().toISOString(),
+                admin: 'Admin User',
+                action: action,
+                details: details,
+                ip: '127.0.0.1' // In real system, get actual IP
+            };
+            
+            // In a real system, this would send to audit service
+            console.log('Admin Action Logged:', logEntry);
+        }
+
+        // Notification preferences
+        let notificationSettings = {
+            newUsers: true,
+            newCampaigns: true,
+            suspiciousActivity: true,
+            systemAlerts: true
+        };
+
+        function updateNotificationPreferences(setting, enabled) {
+            notificationSettings[setting] = enabled;
+            showToast('Settings', `Notification preference updated: ${setting}`, 'info');
+        }
+
+        // Advanced filtering
+        function applyAdvancedFilter(data, filters) {
+            return data.filter(item => {
+                return Object.keys(filters).every(key => {
+                    if (!filters[key]) return true;
+                    return item[key] && item[key].toString().toLowerCase().includes(filters[key].toLowerCase());
+                });
+            });
+        }
+
+        // Data refresh mechanism
+        function refreshAllData() {
+            showToast('Refresh', 'Refreshing all data...', 'info');
+            
+            // Simulate data refresh
+            setTimeout(() => {
+                updateDashboardStats();
+                loadRecentActivity();
+                if (adminData.currentPage === 'users') loadUsersData();
+                if (adminData.currentPage === 'campaigns') loadCampaignsData();
+                if (adminData.currentPage === 'transactions') loadTransactionsData();
+                
+                showToast('Success', 'All data refreshed successfully!', 'success');
+            }, 1500);
+        }
+
+        // Emergency actions
+        function emergencyLockdown() {
+            if (confirm('This will lock down the platform. Are you sure?')) {
+                showToast('Emergency', 'Platform lockdown initiated', 'error');
+                
+                setTimeout(() => {
+                    showToast('System', 'Emergency lockdown completed', 'warning');
+                }, 3000);
+            }
+        }
+
+        function emergencyNotification(message) {
+            showToast('Emergency Alert', message, 'error');
+            
+            // In real system, this would trigger emergency notifications
+            console.log('Emergency notification sent:', message);
+        }
+
+        // Backup and restore
+        function initiateBackup() {
+            showToast('Backup', 'Starting platform backup...', 'info');
+            
+            setTimeout(() => {
+                showToast('Success', 'Platform backup completed successfully!', 'success');
+            }, 5000);
+        }
+
+        function restoreFromBackup() {
+            if (confirm('This will restore from the latest backup. Continue?')) {
+                showToast('Restore', 'Restoring from backup...', 'warning');
+                
+                setTimeout(() => {
+                    showToast('Success', 'Platform restored successfully!', 'success');
+                    refreshAllData();
+                }, 8000);
+            }
+        }
+
+        // Analytics tracking
+        function trackAdminUsage(action, page) {
+            const usage = {
+                timestamp: new Date().toISOString(),
+                admin: 'Admin User',
+                action: action,
+                page: page,
+                sessionId: 'session_' + Date.now()
+            };
+            
+            // In real system, send to analytics service
+            console.log('Admin Usage Tracked:', usage);
+        }
+
+        // Performance optimization
+        function optimizeTableRendering(data, batchSize = 50) {
+            // For large datasets, implement virtual scrolling or pagination
+            if (data.length > batchSize) {
+                return data.slice(0, batchSize);
+            }
+            return data;
+        }
+
+        // Error handling
+        function handleAdminError(error, context) {
+            console.error('Admin Panel Error:', error, 'Context:', context);
+            showToast('Error', 'An error occurred. Please try again.', 'error');
+            
+            // In real system, send error to monitoring service
+        }
+
+        // Session management
+        let sessionTimeout;
+        function resetSessionTimeout() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(() => {
+                showToast('Session', 'Session will expire in 5 minutes', 'warning');
+            }, 25 * 60 * 1000); // 25 minutes
+        }
+
+        // Initialize session management
+        resetSessionTimeout();
+        document.addEventListener('click', resetSessionTimeout);
+        document.addEventListener('keypress', resetSessionTimeout);
+
+        // Final initialization
+        console.log('Ketto Admin Panel initialized successfully');
+        console.log('Available functions:', {
+            navigation: ['showAdminPage'],
+            data: ['loadUsersData', 'loadCampaignsData', 'loadTransactionsData'],
+            actions: ['viewUser', 'editUser', 'deleteUser', 'exportUsers'],
+            system: ['refreshAllData', 'initiateBackup', 'emergencyLockdown'],
+            ui: ['showToast', 'performAdminSearch']
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto Admin Panel - Platform Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --gradient-success: linear-gradient(135deg, var(--success-color), #2ecc71);
+            --gradient-warning: linear-gradient(135deg, var(--warning-color), #e67e22);
+            --admin-sidebar: #2c3e50;
+            --admin-header: #34495e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-color);
+        }
+
+        /* Admin Layout */
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Admin Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: var(--admin-sidebar);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .admin-logo h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .admin-logo p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .admin-nav {
+            list-style: none;
+        }
+
+        .admin-nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .admin-nav-link:hover,
+        .admin-nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .admin-nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .admin-nav-badge {
+            margin-left: auto;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Admin Main Content */
+        .admin-main {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Admin Header */
+        .admin-header {
+            background: var(--admin-header);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            height: 70px;
+        }
+
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-search input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .admin-search input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .admin-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .admin-page {
+            display: none;
+        }
+
+        .admin-page.active {
+            display: block;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.success::before {
+            background: var(--gradient-success);
+        }
+
+        .stat-card.warning::before {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card.info::before {
+            background: var(--gradient-secondary);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            background: var(--gradient-primary);
+        }
+
+        .stat-icon.success { background: var(--gradient-success); }
+        .stat-icon.warning { background: var(--gradient-warning); }
+        .stat-icon.info { background: var(--gradient-secondary); }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* Tables */
+        .admin-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .admin-table th {
+            background: var(--light-color);
+            color: var(--dark-color);
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .admin-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .admin-table tr:hover {
+            background: rgba(231, 76, 60, 0.02);
+        }
+
+        .table-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-suspended {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+        }
+
+        .status-completed {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+        .action-btn.edit {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .action-btn.delete {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+        }
+
+        .action-btn.view {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Charts and Analytics */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .chart-placeholder {
+            height: 250px;
+            background: linear-gradient(135deg, var(--light-color), #e8f4f8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Activity Feed */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .activity-item:hover {
+            background: var(--light-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            flex-shrink: 0;
+            background: var(--gradient-primary);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--dark-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-hover);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--error-color); }
+        .toast.warning { background: var(--warning-color); }
+        .toast.info { background: var(--secondary-color); }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .toast-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .admin-sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-search input {
+                width: 150px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-table {
+                font-size: 0.8rem;
+            }
+
+            .admin-table th,
+            .admin-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Admin Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="admin-logo">
+                <h2>Ketto</h2>
+                <p>Admin Dashboard</p>
+            </div>
+
+            <nav class="admin-nav">
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link active" onclick="showAdminPage('dashboard')">
+                        <span class="admin-nav-icon">📊</span>
+                        Dashboard
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('users')">
+                        <span class="admin-nav-icon">👥</span>
+                        User Management
+                        <span class="admin-nav-badge" id="usersBadge">1,247</span>
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('campaigns')">
+                        <span class="admin-nav-icon">🎯</span>
+                        Campaigns
+                        <span class="admin-nav-badge" id="campaignsBadge">342</span>
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('transactions')">
+                        <span class="admin-nav-icon">💰</span>
+                        Transactions
+                        <span class="admin-nav-badge" id="transactionsBadge">8,924</span>
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('analytics')">
+                        <span class="admin-nav-icon">📈</span>
+                        Analytics
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('reports')">
+                        <span class="admin-nav-icon">📋</span>
+                        Reports
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('settings')">
+                        <span class="admin-nav-icon">⚙️</span>
+                        Settings
+                    </div>
+                </div>
+                <div class="admin-nav-item">
+                    <div class="admin-nav-link" onclick="showAdminPage('security')">
+                        <span class="admin-nav-icon">🔒</span>
+                        Security
+                        <span class="admin-nav-badge" id="securityBadge">3</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Admin Main Content -->
+        <div class="admin-main">
+            <!-- Admin Header -->
+            <header class="admin-header">
+                <div class="admin-title">
+                    🛡️ Admin Panel
+                </div>
+
+                <div class="admin-controls">
+                    <!-- Search -->
+                    <div class="admin-search">
+                        <input type="text" placeholder="Search users, campaigns..." id="adminSearchInput">
+                    </div>
+
+                    <!-- Admin User -->
+                    <div class="admin-user" onclick="showAdminMenu()">
+                        <div class="admin-avatar">A</div>
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="font-weight: 600; font-size: 0.9rem;">Admin User</div>
+                            <div style="font-size: 0.7rem; opacity: 0.8;">Super Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="admin-page active">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Platform Overview</h1>
+                        <p class="dashboard-subtitle">Monitor key metrics and platform health in real-time</p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-title">Total Revenue</div>
+                                <div class="stat-icon">💰</div>
+                            </div>
+                            <div class="stat-value" id="totalRevenue">₹2.45M</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +12.5% from last month
+                            </div>
+                        </div>
+
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <div class="stat-title">Active Users</div>
+                                <div class="stat-icon success">👥</div>
+                            </div>
+                            <div class="stat-value" id="activeUsers">24,387</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +8.2% from last week
+                            </div>
+                        </div>
+
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <div class="stat-title">Live Campaigns</div>
+                                <div class="stat-icon warning">🎯</div>
+                            </div>
+                            <div class="stat-value" id="liveCampaigns">1,847</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +156 this week
+                            </div>
+                        </div>
+
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <div class="stat-title">Success Rate</div>
+                                <div class="stat-icon info">📈</div>
+                            </div>
+                            <div class="stat-value" id="successRate">73.8%</div>
+                            <div class="stat-change">
+                                <span>↗</span>
+                                +2.1% improvement
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Revenue Analytics</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                📊 Interactive Revenue Chart
+                                <br><small>Real-time data visualization</small>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Top Categories</h3>
+                            </div>
+                            <div class="chart-placeholder">
+                                🥧 Category Distribution
+                                <br><small>Campaign success by category</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Recent Platform Activity</h3>
+                        </div>
+                        <div class="activity-list" id="recentActivityList">
+                            <!-- Activity items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Management Page -->
+                <div id="usersPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">User Management</h1>
+                        <p class="dashboard-subtitle">Manage user accounts, permissions, and verification status</p>
+                    </div>
+
+                    <div class="admin-table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Platform Users</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportUsers()">📊 Export</button>
+                                <button class="btn btn-primary" onclick="addUser()">👤 Add User</button>
+                            </div>
+                        </div>
+
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                    <th>Campaigns</th>
+                                    <th>Donations</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- User rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Campaigns Management Page -->
+                <div id="campaignsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Campaign Management</h1>
+                        <p class="dashboard-subtitle">Review, approve, and monitor all platform campaigns</p>
+                    </div>
+
+                    <div class="admin-table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">All Campaigns</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportCampaigns()">📊 Export</button>
+                                <button class="btn btn-secondary" onclick="reviewPendingCampaigns()">⏳ Review Pending</button>
+                            </div>
+                        </div>
+
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Creator</th>
+                                    <th>Category</th>
+                                    <th>Goal</th>
+                                    <th>Raised</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaignsTableBody">
+                                <!-- Campaign rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Transactions Page -->
+                <div id="transactionsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">Transaction Management</h1>
+                        <p class="dashboard-subtitle">Monitor and manage all financial transactions</p>
+                    </div>
+
+                    <div class="admin-table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Recent Transactions</h3>
+                            <div class="table-actions">
+                                <button class="btn btn-outline" onclick="exportTransactions()">📊 Export</button>
+                                <button class="btn btn-success" onclick="generateFinancialReport()">📋 Financial Report</button>
+                            </div>
+                        </div>
+
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>User</th>
+                                    <th>Campaign</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th

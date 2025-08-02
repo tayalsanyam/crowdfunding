@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto - Crowdfunding Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+            padding: 1rem 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #c0392b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s ease;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+            background: var(--light-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .form-control.error {
+            border-color: var(--error-color);
+            background: #ffeaea;
+        }
+
+        .form-control.success {
+            border-color: var(--success-color);
+            background: #eafaf1;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .strength-weak { background: var(--error-color); }
+        .strength-medium { background: var(--warning-color); }
+        .strength-strong { background: var(--success-color); }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            background: var(--light-color);
+            padding-top: 100px;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-nav button {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-nav button.active,
+        .dashboard-nav button:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), #c0392b);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .profile-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .profile-avatar-section {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .campaign-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .campaign-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .campaign-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .campaign-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .campaign-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), #2ecc71);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .profile-section {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .dashboard-nav {
+                gap: 0.5rem;
+            }
+
+            .dashboard-nav button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--error-color); }
+        .toast.info { background: var(--secondary-color); }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="container">
+            <a href="#" class="logo" onclick="showHome()">Ketto</a>
+            
+            <ul class="nav-links">
+                <li><a href="#" onclick="showHome()">Home</a></li>
+                <li><a href="#" onclick="showMessage('Campaigns page coming in Day 3!')">Campaigns</a></li>
+                <li><a href="#" onclick="showMessage('How It Works page coming soon!')">How It Works</a></li>
+                <li><a href="#" onclick="showMessage('About page coming soon!')">About</a></li>
+                <li><a href="#" onclick="showMessage('Contact page coming soon!')">Contact</a></li>
+            </ul>
+
+            <!-- Auth Buttons (shown when not logged in) -->
+            <div class="auth-buttons" id="authButtons">
+                <a href="#" class="btn btn-outline" onclick="openModal('loginModal')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="openModal('signupModal')">Sign Up</a>
+            </div>
+
+            <!-- User Menu (shown when logged in) -->
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatar">U</div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#" class="dropdown-item" onclick="showDashboard()">Dashboard</a>
+                    <a href="#" class="dropdown-item" onclick="showMessage('Profile editing coming soon!')">Edit Profile</a>
+                    <a href="#" class="dropdown-item" onclick="showMessage('Settings coming soon!')">Settings</a>
+                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <button class="dropdown-item" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Home Page Content -->
+    <main id="homePage">
+        <!-- Hero Section -->
+        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 180px 0 120px; text-align: center;">
+            <div class="container">
+                <h1 style="font-size: 4rem; font-weight: 800; margin-bottom: 1.5rem;">Fund Dreams,<br>Change Lives</h1>
+                <p style="font-size: 1.4rem; margin-bottom: 2.5rem; opacity: 0.95;">Join millions of people who are raising funds for personal, creative, and charitable causes across India</p>
+                <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="#" class="btn btn-primary" style="padding: 1.2rem 2.5rem; font-size: 1.2rem;" onclick="showMessage('Campaign creation coming in Day 3!')">Start Fundraising</a>
+                    <a href="#" class="btn btn-outline" style="padding: 1.2rem 2.5rem; font-size: 1.2rem; background: rgba(255,255,255,0.2); border-color: white;" onclick="showMessage('Campaign browsing coming in Day 3!')">Explore Campaigns</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section style="background: var(--light-color); padding: 80px 0;">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">₹50Cr+</h3>
+                        <p style="color: #666;">Total Raised</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">25K+</h3>
+                        <p style="color: #666;">Campaigns</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">100K+</h3>
+                        <p style="color: #666;">Donors</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">85%</h3>
+                        <p style="color: #666;">Success Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboardPage">
+        <div class="dashboard-header">
+            <div class="container">
+                <h1 class="dashboard-title">Welcome back, <span id="dashboardUserName">User</span>!</h1>
+                <p class="dashboard-subtitle">Manage your campaigns and track your impact</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="dashboard-nav">
+                <button class="active" onclick="showDashboardSection('overview')">Overview</button>
+                <button onclick="showDashboardSection('campaigns')">My Campaigns</button>
+                <button onclick="showDashboardSection('donations')">My Donations</button>
+                <button onclick="showDashboardSection('profile')">Profile</button>
+            </div>
+
+            <!-- Overview Section -->
+            <div class="dashboard-content" id="overviewSection">
+                <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Dashboard Overview</h2>
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <h3 id="userCampaignsCount">0</h3>
+                        <p>Active Campaigns</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="userTotalRaised">₹0</h3>
+                        <p>Total Raised</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="userDonationsCount">0</h3>
+                        <p>Donations Made</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="userImpactScore">0</h3>
+                        <p>Impact Score</p>
+                    </div>
+                </div>
+                <div style="background: var(--light-color); padding: 2rem; border-radius: 15px; text-align: center;">
+                    <h3 style="color: var(--dark-color); margin-bottom: 1rem;">Ready to make a difference?</h3>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Start your first campaign or support a cause you care about</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="#" class="btn btn-primary" onclick="showMessage('Campaign creation coming in Day 3!')">Create Campaign</a>
+                        <a href="#" class="btn btn-outline" onclick="showMessage('Campaign browsing coming in Day 3!')">Browse Campaigns</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns Section -->
+            <div class="dashboard-content" id="campaignsSection" style="display: none;">
+                <h2 style="margin-bottom: 2rem; color: var(--dark-color);">My Campaigns</h2>
+                <div class="campaign-list" id="userCampaignsList">
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>No campaigns yet</h3>
+                        <p>Start your first campaign to begin fundraising</p>
+                        <a href="#" class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Campaign creation coming in Day 3!')">Create Your First Campaign</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donations Section -->
+            <div class="dashboard-content" id="donationsSection" style="display: none;">
+                <h2 style="margin-bottom: 2rem; color: var(--dark-color);">My Donations</h2>
+                <div id="userDonationsList">
+                    <div style="text-align: center; padding: 3rem; color: #666;">
+                        <h3>No donations yet</h3>
+                        <p>Support a campaign to make your first donation</p>
+                        <a href="#" class="btn btn-primary" style="margin-top: 1rem;" onclick="showMessage('Campaign browsing coming in Day 3!')">Browse Campaigns</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="dashboard-content" id="profileSection" style="display: none;">
+                <h2 style="margin-bottom: 2rem; color: var(--dark-color);">Profile Settings</h2>
+                <div class="profile-section">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar" id="profileAvatar">U</div>
+                        <h3 id="profileName">User Name</h3>
+                        <p style="color: #666;" id="profileEmail">user@email.com</p>
+                        <button class="btn btn-outline" style="margin-top: 1rem;" onclick="showMessage('Avatar upload coming soon!')">Change Avatar</button>
+                    </div>
+                    <div>
+                        <form onsubmit="updateProfile(event)">
+                            <div class="form-group">
+                                <label for="profileFullName">Full Name</label>
+                                <input type="text" id="profileFullName" class="form-control" placeholder="Enter your full name">
+                            </div>
+                            <div class="form-group">
+                                <label for="profilePhone">Phone Number</label>
+                                <input type="tel" id="profilePhone" class="form-control" placeholder="Enter your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileBio">Bio</label>
+                                <textarea id="profileBio" class="form-control" rows="3" placeholder="Tell us about yourself"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <div class="modal-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your Ketto account</p>
+            </div>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+            </form>
+            <div class="form-footer">
+                <p>Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('signupModal');">Sign up here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <div class="modal-header">
+                <h2>Join Ketto</h2>
+                <p>Create your account and start making a difference</p>
+            </div>
+            <form onsubmit="signup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" class="form-control" placeholder="Create a strong password" required>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Password strength: Weak</div>
+                    </div>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" class="form-control" placeholder="Enter your phone number" required>
+                    <div class="error-message" id="signupPhoneError"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+            </form>
+            <div class="form-footer">
+                <p>Already have an account? <a href="#" onclick="closeModal('signupModal'); openModal('loginModal');">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let users = [
+            { 
+                id: 1, 
+                name: "Demo User", 
+                email: "demo@ketto.com", 
+                password: "demo123", 
+                phone: "+91 9876543210",
+                bio: "Passionate about making a difference",
+                joinDate: "2024-01-15",
+                campaigns: [],
+                donations: [],
+                totalRaised: 0
+            }
+        ];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            initializePasswordStrength();
+            initializeClickOutside();
+        });
+
+        // Authentication Functions
+        function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            // Clear previous errors
+            clearErrors(['loginEmailError', 'loginPasswordError']);
+            
+            // Validation
+            if (!validateEmail(email)) {
+                showError('loginEmailError', 'Please enter a valid email address');
+                return;
+            }
+            
+            if (!password) {
+                showError('loginPasswordError', 'Password is required');
+                return;
+            }
+            
+            // Find user
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateAuthState();
+                closeModal('loginModal');
+                showToast('Welcome back, ' + user.name.split(' ')[0] + '!', 'success');
+                showDashboard();
+            } else {
+                showError('loginPasswordError', 'Invalid email or password');
+            }
+        }
+
+        function signup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            
+            // Clear previous errors
+            clearErrors(['signupNameError', 'signupEmailError', 'signupPasswordError', 'signupPhoneError']);
+            
+            // Validation
+            let hasErrors = false;
+            
+            if (name.length < 2) {
+                showError('signupNameError', 'Name must be at least 2 characters long');
+                hasErrors = true;
+            }
+            
+            if (!validateEmail(email)) {
+                showError('signupEmailError', 'Please enter a valid email address');
+                hasErrors = true;
+            } else if (users.find(u => u.email === email)) {
+                showError('signupEmailError', 'An account with this email already exists');
+                hasErrors = true;
+            }
+            
+            const passwordStrength = checkPasswordStrength(password);
+            if (passwordStrength.score < 2) {
+                showError('signupPasswordError', 'Password is too weak. Please choose a stronger password');
+                hasErrors = true;
+            }
+            
+            if (!validatePhone(phone)) {
+                showError('signupPhoneError', 'Please enter a valid phone number');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) return;
+            
+            // Create new user
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                password: password,
+                phone: phone,
+                bio: '',
+                joinDate: new Date().toISOString().split('T')[0],
+                campaigns: [],
+                donations: [],
+                totalRaised: 0
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            updateAuthState();
+            closeModal('signupModal');
+            showToast('Account created successfully! Welcome to Ketto, ' + name.split(' ')[0] + '!', 'success');
+            showDashboard();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthState();
+            showHome();
+            showToast('You have been logged out successfully', 'info');
+        }
+
+        function checkAuthState() {
+            const savedUser = localStorage.getItem('currentUser');
+            const savedUsers = localStorage.getItem('users');
+            
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            }
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthState();
+            }
+        }
+
+        function updateAuthState() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'block';
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+                updateDashboardData();
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        // Dashboard Functions
+        function showDashboard() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('dashboardPage').classList.add('active');
+            updateDashboardData();
+        }
+
+        function showHome() {
+            document.getElementById('homePage').style.display = 'block';
+            document.getElementById('dashboardPage').classList.remove('active');
+        }
+
+        function showDashboardSection(section) {
+            // Hide all sections
+            const sections = ['overviewSection', 'campaignsSection', 'donationsSection', 'profileSection'];
+            sections.forEach(s => {
+                document.getElementById(s).style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(section + 'Section').style.display = 'block';
+            
+            // Update nav buttons
+            document.querySelectorAll('.dashboard-nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load section-specific data
+            if (section === 'profile') {
+                loadProfileData();
+            }
+        }
+
+        function updateDashboardData() {
+            if (!currentUser) return;
+            
+            document.getElementById('dashboardUserName').textContent = currentUser.name.split(' ')[0];
+            document.getElementById('userCampaignsCount').textContent = currentUser.campaigns.length;
+            document.getElementById('userTotalRaised').textContent = '₹' + formatNumber(currentUser.totalRaised);
+            document.getElementById('userDonationsCount').textContent = currentUser.donations.length;
+            document.getElementById('userImpactScore').textContent = calculateImpactScore(currentUser);
+        }
+
+        function loadProfileData() {
+            if (!currentUser) return;
+            
+            document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileFullName').value = currentUser.name;
+            document.getElementById('profilePhone').value = currentUser.phone || '';
+            document.getElementById('profileBio').value = currentUser.bio || '';
+        }
+
+        function updateProfile(event) {
+            event.preventDefault();
+            
+            if (!currentUser) return;
+            
+            const name = document.getElementById('profileFullName').value.trim();
+            const phone = document.getElementById('profilePhone').value.trim();
+            const bio = document.getElementById('profileBio').value.trim();
+            
+            if (name.length < 2) {
+                showToast('Name must be at least 2 characters long', 'error');
+                return;
+            }
+            
+            if (phone && !validatePhone(phone)) {
+                showToast('Please enter a valid phone number', 'error');
+                return;
+            }
+            
+            // Update user data
+            currentUser.name = name;
+            currentUser.phone = phone;
+            currentUser.bio = bio;
+            
+            // Update in users array
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = currentUser;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            updateAuthState();
+            loadProfileData();
+            showToast('Profile updated successfully!', 'success');
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+            clearFormErrors(modalId);
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Validation Functions
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePhone(phone) {
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            return phoneRegex.test(phone.replace(/\s/g, ''));
+        }
+
+        function checkPasswordStrength(password) {
+            let score = 0;
+            let feedback = [];
+            
+            if (password.length >= 8) score++;
+            else feedback.push('At least 8 characters');
+            
+            if (/[a-z]/.test(password)) score++;
+            else feedback.push('Lowercase letter');
+            
+            if (/[A-Z]/.test(password)) score++;
+            else feedback.push('Uppercase letter');
+            
+            if (/[0-9]/.test(password)) score++;
+            else feedback.push('Number');
+            
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            else feedback.push('Special character');
+            
+            return { score, feedback };
+        }
+
+        function initializePasswordStrength() {
+            const passwordInput = document.getElementById('signupPassword');
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const strength = checkPasswordStrength(password);
+                
+                let width = (strength.score / 5) * 100;
+                let className = 'strength-weak';
+                let text = 'Weak';
+                
+                if (strength.score >= 4) {
+                    className = 'strength-strong';
+                    text = 'Strong';
+                } else if (strength.score >= 2) {
+                    className = 'strength-medium';
+                    text = 'Medium';
+                }
+                
+                strengthFill.style.width = width + '%';
+                strengthFill.className = 'strength-fill ' + className;
+                strengthText.textContent = 'Password strength: ' + text;
+                strengthText.className = 'strength-text ' + className;
+            });
+        }
+
+        // Error Handling
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            const inputElement = document.getElementById(elementId.replace('Error', ''));
+            
+            errorElement.textContent = message;
+            errorElement.classList.add('active');
+            inputElement.classList.add('error');
+        }
+
+        function clearErrors(errorIds) {
+            errorIds.forEach(id => {
+                const errorElement = document.getElementById(id);
+                const inputElement = document.getElementById(id.replace('Error', ''));
+                
+                if (errorElement) {
+                    errorElement.classList.remove('active');
+                    errorElement.textContent = '';
+                }
+                
+                if (inputElement) {
+                    inputElement.classList.remove('error');
+                }
+            });
+        }
+
+        function clearFormErrors(modalId) {
+            const modal = document.getElementById(modalId);
+            const errorMessages = modal.querySelectorAll('.error-message');
+            const inputs = modal.querySelectorAll('.form-control');
+            
+            errorMessages.forEach(error => {
+                error.classList.remove('active');
+                error.textContent = '';
+            });
+            
+            inputs.forEach(input => {
+                input.classList.remove('error', 'success');
+            });
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Utility Functions
+        function formatNumber(num) {
+            if (num >= 10000000) {
+                return (num / 10000000).toFixed(1) + 'Cr';
+            } else if (num >= 100000) {
+                return (num / 100000).toFixed(1) + 'L';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function calculateImpactScore(user) {
+            let score = 0;
+            score += user.campaigns.length * 10;
+            score += user.donations.length * 5;
+            score += Math.floor(user.totalRaised / 1000);
+            return Math.min(score, 999);
+        }
+
+        function initializeClickOutside() {
+            document.addEventListener('click', function(event) {
+                const userMenu = document.getElementById('userMenu');
+                const dropdown = document.getElementById('dropdownMenu');
+                
+                if (!userMenu.contains(event.target)) {
+                    dropdown.classList.remove('active');
+                }
+                
+                // Close modals when clicking outside
+                const modals = document.querySelectorAll('.modal.active');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+        }
+
+        // Placeholder function for features coming in Day 3
+        function showMessage(message) {
+            showToast(message, 'info');
+        }
+
+        // Demo data function (can be removed in production)
+        function addDemoData() {
+            if (currentUser) {
+                currentUser.campaigns = [
+                    {
+                        id: 1,
+                        title: "Help Build School Library",
+                        goal: 50000,
+                        raised: 32000,
+                        status: "active",
+                        created: "2024-06-15"
+                    }
+                ];
+                currentUser.donations = [
+                    {
+                        id: 1,
+                        amount: 5000,
+                        campaign: "Medical Emergency Fund",
+                        date: "2024-07-01"
+                    }
+                ];
+                currentUser.totalRaised = 32000;
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateDashboardData();
+                showToast('Demo data added!', 'success');
+            }
+        }
+
+        // Add demo data button (for testing purposes)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                addDemoData();
+            }
+        });
+    </script>
+</body>
+</html>

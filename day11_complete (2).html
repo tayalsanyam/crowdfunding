@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto Advanced Admin - Day 11 Complete</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --info-color: #17a2b8;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --gradient-success: linear-gradient(135deg, var(--success-color), #2ecc71);
+            --gradient-warning: linear-gradient(135deg, var(--warning-color), #e67e22);
+            --gradient-info: linear-gradient(135deg, var(--info-color), #138496);
+            --gradient-dark: linear-gradient(135deg, var(--dark-color), #34495e);
+            --admin-sidebar: #1a252f;
+            --admin-header: #2c3e50;
+            --automation-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --ai-gradient: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-color);
+        }
+
+        /* Admin Layout */
+        .admin-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Enhanced Sidebar */
+        .admin-sidebar {
+            width: 300px;
+            background: var(--admin-sidebar);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-hover);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0 1.5rem;
+            position: relative;
+        }
+
+        .admin-logo h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .admin-logo p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .admin-nav {
+            list-style: none;
+        }
+
+        .admin-nav-item {
+            margin-bottom: 0.125rem;
+        }
+
+        .admin-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .admin-nav-link:hover,
+        .admin-nav-link.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-left-color: var(--primary-color);
+            transform: translateX(2px);
+        }
+
+        .admin-nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .admin-nav-badge {
+            margin-left: auto;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.125rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* Admin Main Content */
+        .admin-main {
+            margin-left: 300px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Enhanced Header */
+        .admin-header {
+            background: var(--admin-header);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-hover);
+            height: 80px;
+        }
+
+        .admin-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .admin-search input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.625rem 1rem;
+            border-radius: 25px;
+            width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .admin-search input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .admin-content {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .admin-page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .admin-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* Advanced Stats Grid */
+        .advanced-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .advanced-stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .advanced-stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .advanced-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-header-advanced {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-title-advanced {
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stat-icon-advanced {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: var(--gradient-primary);
+        }
+
+        .stat-main-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-secondary-value {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .stat-trend-advanced {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* AI Insights */
+        .ai-insights-panel {
+            background: var(--ai-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .ai-insights-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-insights-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .ai-insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .ai-insight-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-insight-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-insight-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-insight-description {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Automation Center */
+        .automation-center {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .automation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .automation-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .automation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .automation-card {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .automation-card.active {
+            border-color: var(--success-color);
+            background: rgba(39, 174, 96, 0.02);
+        }
+
+        .automation-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .automation-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .automation-toggle {
+            width: 50px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .automation-toggle.active {
+            background: var(--success-color);
+        }
+
+        .automation-toggle::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .automation-toggle.active::before {
+            transform: translateX(24px);
+        }
+
+        .automation-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .automation-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .automation-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--light-color);
+            border-radius: 10px;
+        }
+
+        .automation-stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .automation-stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* Workflow Builder */
+        .workflow-builder {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .workflow-canvas {
+            min-height: 400px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .workflow-node {
+            position: absolute;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1rem;
+            min-width: 150px;
+            box-shadow: var(--shadow);
+            cursor: move;
+        }
+
+        .workflow-node.trigger { border-color: var(--success-color); }
+        .workflow-node.action { border-color: var(--secondary-color); }
+        .workflow-node.condition { border-color: var(--warning-color); }
+
+        .node-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-description {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* Role Management */
+        .role-management {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .role-card {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            border-color: var(--secondary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .role-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .role-count {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-permissions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Settings */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .settings-card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            min-width: 350px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .advanced-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .automation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Enhanced Admin Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <h2>Ketto</h2>
+                <p>Advanced Admin Hub</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">AI Intelligence</div>
+                <nav class="admin-nav">
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link active" onclick="showAdminPage('dashboard')">
+                            <span class="admin-nav-icon">🚀</span>
+                            AI Dashboard
+                            <span class="admin-nav-badge">AI</span>
+                        </div>
+                    </div>
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('automation')">
+                            <span class="admin-nav-icon">⚡</span>
+                            Automation Center
+                            <span class="admin-nav-badge">New</span>
+                        </div>
+                    </div>
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('analytics')">
+                            <span class="admin-nav-icon">📊</span>
+                            Advanced Analytics
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Management</div>
+                <nav class="admin-nav">
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('workflows')">
+                            <span class="admin-nav-icon">🔄</span>
+                            Workflow Builder
+                            <span class="admin-nav-badge">Beta</span>
+                        </div>
+                    </div>
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('roles')">
+                            <span class="admin-nav-icon">🔐</span>
+                            Role Management
+                        </div>
+                    </div>
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('reports')">
+                            <span class="admin-nav-icon">📋</span>
+                            Smart Reports
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">System</div>
+                <nav class="admin-nav">
+                    <div class="admin-nav-item">
+                        <div class="admin-nav-link" onclick="showAdminPage('settings')">
+                            <span class="admin-nav-icon">⚙️</span>
+                            System Settings
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Admin Main Content -->
+        <div class="admin-main">
+            <!-- Enhanced Admin Header -->
+            <header class="admin-header">
+                <div class="admin-title">
+                    🛡️ Advanced Admin Day 11
+                </div>
+
+                <div class="admin-controls">
+                    <div class="admin-search">
+                        <input type="text" placeholder="AI-powered search..." id="adminSearchInput">
+                    </div>
+
+                    <div class="admin-user">
+                        <div class="admin-avatar">A</div>
+                        <div>
+                            <div style="font-weight: 600;">Admin User</div>
+                            <div style="font-size: 0.75rem; opacity: 0.8;">Super Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="admin-content">
+                <!-- AI-Powered Dashboard -->
+                <div id="dashboardPage" class="admin-page active">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">AI-Powered Intelligence Dashboard</h1>
+                        <p class="dashboard-subtitle">Advanced automation, predictive analytics, and intelligent insights</p>
+                    </div>
+
+                    <!-- AI Insights Panel -->
+                    <div class="ai-insights-panel">
+                        <div class="ai-insights-header">
+                            <h2 class="ai-insights-title">🤖 AI Intelligence Center</h2>
+                        </div>
+                        
+                        <div class="ai-insights-grid">
+                            <div class="ai-insight-card">
+                                <div class="ai-insight-title">
+                                    🎯 Campaign Success Prediction
+                                </div>
+                                <div class="ai-insight-value" id="aiSuccessPrediction">89.3%</div>
+                                <div class="ai-insight-description">
+                                    Current campaigns have excellent success probability based on ML analysis of historical data and engagement patterns.
+                                </div>
+                            </div>
+
+                            <div class="ai-insight-card">
+                                <div class="ai-insight-title">
+                                    💰 Revenue Forecast
+                                </div>
+                                <div class="ai-insight-value" id="aiRevenueForecast">₹4.2M</div>
+                                <div class="ai-insight-description">
+                                    Projected revenue for next month with 94% confidence based on predictive modeling and trend analysis.
+                                </div>
+                            </div>
+
+                            <div class="ai-insight-card">
+                                <div class="ai-insight-title">
+                                    ⚠️ Risk Assessment
+                                </div>
+                                <div class="ai-insight-value" id="aiRiskScore">Low Risk</div>
+                                <div class="ai-insight-description">
+                                    Platform risk remains minimal with stable growth metrics and intelligent fraud prevention systems.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Stats Grid -->
+                    <div class="advanced-stats-grid">
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">AI Optimization Score</div>
+                                <div class="stat-icon-advanced">🧠</div>
+                            </div>
+                            <div class="stat-main-value" id="aiOptimizationScore">96.7%</div>
+                            <div class="stat-secondary-value">Platform efficiency with AI</div>
+                            <div class="stat-trend-advanced">
+                                <span>📈</span>
+                                +7.2% this week
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Automated Workflows</div>
+                                <div class="stat-icon-advanced">⚡</div>
+                            </div>
+                            <div class="stat-main-value" id="automatedWorkflows">47</div>
+                            <div class="stat-secondary-value">Active automation rules</div>
+                            <div class="stat-trend-advanced">
+                                <span>⚡</span>
+                                +12 new this month
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">ML Model Accuracy</div>
+                                <div class="stat-icon-advanced">🎯</div>
+                            </div>
+                            <div class="stat-main-value" id="mlAccuracy">94.8%</div>
+                            <div class="stat-secondary-value">Prediction accuracy rate</div>
+                            <div class="stat-trend-advanced">
+                                <span>🚀</span>
+                                +3.1% improved
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Processing Speed</div>
+                                <div class="stat-icon-advanced">💨</div>
+                            </div>
+                            <div class="stat-main-value" id="processingSpeed">1.2s</div>
+                            <div class="stat-secondary-value">Average response time</div>
+                            <div class="stat-trend-advanced">
+                                <span>📊</span>
+                                -0.3s faster
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automation Center -->
+                <div id="automationPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">⚡ Automation Center</h1>
+                        <p class="dashboard-subtitle">Configure intelligent workflows and automated processes</p>
+                    </div>
+
+                    <div class="automation-center">
+                        <div class="automation-header">
+                            <h2 class="automation-title">🤖 Intelligent Automation</h2>
+                            <button class="btn btn-primary" onclick="createNewAutomation()">⚡ Create Automation</button>
+                        </div>
+
+                        <div class="automation-grid">
+                            <div class="automation-card active">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Auto Campaign Approval</h3>
+                                    <div class="automation-toggle active" onclick="toggleAutomation(this, 'campaign-approval')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    Automatically approve campaigns that meet predefined criteria including verified users, complete documentation, and risk assessment scores above 85%.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">278</div>
+                                        <div class="automation-stat-label">Approved</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">12</div>
+                                        <div class="automation-stat-label">Flagged</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">95%</div>
+                                        <div class="automation-stat-label">Accuracy</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="automation-card active">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Smart Fraud Detection</h3>
+                                    <div class="automation-toggle active" onclick="toggleAutomation(this, 'fraud-detection')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    AI-powered system that detects suspicious activities, unusual donation patterns, and potential fraud attempts in real-time with machine learning.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">34</div>
+                                        <div class="automation-stat-label">Blocked</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">0</div>
+                                        <div class="automation-stat-label">False +</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">100%</div>
+                                        <div class="automation-stat-label">Accuracy</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="automation-card">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Donor Engagement</h3>
+                                    <div class="automation-toggle" onclick="toggleAutomation(this, 'donor-engagement')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    Automatically send personalized thank you messages, campaign updates, and re-engagement campaigns based on donor behavior analysis.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">1.2K</div>
+                                        <div class="automation-stat-label">Sent</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">82%</div>
+                                        <div class="automation-stat-label">Open Rate</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">31%</div>
+                                        <div class="automation-stat-label">CTR</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="automation-card active">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Performance Optimization</h3>
+                                    <div class="automation-toggle active" onclick="toggleAutomation(this, 'performance-opt')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    Continuously optimizes platform performance, automatically scales resources, and manages server load based on real-time demand patterns.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">23%</div>
+                                        <div class="automation-stat-label">CPU Saved</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">99.98%</div>
+                                        <div class="automation-stat-label">Uptime</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">124ms</div>
+                                        <div class="automation-stat-label">Response</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="automation-card">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Content Moderation</h3>
+                                    <div class="automation-toggle" onclick="toggleAutomation(this, 'content-mod')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    AI-powered content filtering that automatically reviews campaign descriptions, images, and updates for inappropriate or harmful content.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">567</div>
+                                        <div class="automation-stat-label">Reviewed</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">18</div>
+                                        <div class="automation-stat-label">Flagged</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">97%</div>
+                                        <div class="automation-stat-label">Accuracy</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="automation-card active">
+                                <div class="automation-card-header">
+                                    <h3 class="automation-card-title">Smart Recommendations</h3>
+                                    <div class="automation-toggle active" onclick="toggleAutomation(this, 'recommendations')"></div>
+                                </div>
+                                <div class="automation-description">
+                                    Provides personalized campaign recommendations to users based on their donation history, interests, browsing behavior, and ML analysis.
+                                </div>
+                                <div class="automation-stats">
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">2.8K</div>
+                                        <div class="automation-stat-label">Served</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">41%</div>
+                                        <div class="automation-stat-label">CTR</div>
+                                    </div>
+                                    <div class="automation-stat">
+                                        <div class="automation-stat-value">₹487K</div>
+                                        <div class="automation-stat-label">Generated</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Analytics -->
+                <div id="analyticsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">📊 Advanced Analytics</h1>
+                        <p class="dashboard-subtitle">Deep insights with machine learning and predictive analytics</p>
+                    </div>
+
+                    <div class="advanced-stats-grid">
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Conversion Funnel</div>
+                                <div class="stat-icon-advanced">🎯</div>
+                            </div>
+                            <div class="stat-main-value">6.2%</div>
+                            <div class="stat-secondary-value">Visitor to donor conversion</div>
+                            <div class="stat-trend-advanced">
+                                <span>📈</span>
+                                +1.4% this month
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Donor Lifetime Value</div>
+                                <div class="stat-icon-advanced">💰</div>
+                            </div>
+                            <div class="stat-main-value">₹5,847</div>
+                            <div class="stat-secondary-value">Average LTV per donor</div>
+                            <div class="stat-trend-advanced">
+                                <span>💎</span>
+                                +₹563 increase
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Engagement Score</div>
+                                <div class="stat-icon-advanced">❤️</div>
+                            </div>
+                            <div class="stat-main-value">9.1/10</div>
+                            <div class="stat-secondary-value">User engagement rating</div>
+                            <div class="stat-trend-advanced">
+                                <span>⭐</span>
+                                +0.7 improved
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Platform Growth</div>
+                                <div class="stat-icon-advanced">🚀</div>
+                            </div>
+                            <div class="stat-main-value">+24.7%</div>
+                            <div class="stat-secondary-value">Month over month</div>
+                            <div class="stat-trend-advanced">
+                                <span>📊</span>
+                                Accelerating growth
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Builder -->
+                <div id="workflowsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">🔄 Workflow Builder</h1>
+                        <p class="dashboard-subtitle">Create intelligent automation workflows with drag-and-drop interface</p>
+                    </div>
+
+                    <div class="workflow-builder">
+                        <div class="automation-header">
+                            <h2 class="automation-title">Visual Workflow Designer</h2>
+                            <div style="display: flex; gap: 1rem;">
+                                <button class="btn btn-outline" onclick="loadWorkflowTemplate()">📋 Load Template</button>
+                                <button class="btn btn-outline" onclick="saveWorkflow()">💾 Save Workflow</button>
+                                <button class="btn btn-primary" onclick="deployWorkflow()">🚀 Deploy</button>
+                            </div>
+                        </div>
+
+                        <div class="workflow-canvas" id="workflowCanvas">
+                            <div class="workflow-node trigger" style="top: 50px; left: 50px;">
+                                <div class="node-title">🎯 Campaign Created</div>
+                                <div class="node-description">Triggers when a new campaign is submitted</div>
+                            </div>
+
+                            <div class="workflow-node condition" style="top: 50px; left: 300px;">
+                                <div class="node-title">❓ Check Criteria</div>
+                                <div class="node-description">Validate campaign meets approval requirements</div>
+                            </div>
+
+                            <div class="workflow-node action" style="top: 150px; left: 300px;">
+                                <div class="node-title">✅ Auto Approve</div>
+                                <div class="node-description">Automatically approve qualifying campaigns</div>
+                            </div>
+
+                            <div class="workflow-node action" style="top: 250px; left: 300px;">
+                                <div class="node-title">📧 Send Notification</div>
+                                <div class="node-description">Notify campaign creator of status</div>
+                            </div>
+
+                            <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 1rem; border-radius: 10px; font-size: 0.9rem; color: #666;">
+                                💡 Drag nodes to reposition<br>
+                                🔗 Click to connect nodes<br>
+                                ⚙️ Double-click to configure
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Role Management -->
+                <div id="rolesPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">🔐 Role Management</h1>
+                        <p class="dashboard-subtitle">Configure user roles, permissions, and access control</p>
+                    </div>
+
+                    <div class="role-management">
+                        <div class="automation-header">
+                            <h2 class="automation-title">User Roles & Permissions</h2>
+                            <button class="btn btn-primary" onclick="createNewRole()">👤 Create Role</button>
+                        </div>
+
+                        <div class="role-grid">
+                            <div class="role-card">
+                                <div class="role-header">
+                                    <h3 class="role-title">Super Admin</h3>
+                                    <div class="role-count">3</div>
+                                </div>
+                                <div class="role-permissions">
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Full system access
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        User management
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Financial oversight
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        System configuration
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline" onclick="editRole('superadmin')">Edit Role</button>
+                            </div>
+
+                            <div class="role-card">
+                                <div class="role-header">
+                                    <h3 class="role-title">Campaign Manager</h3>
+                                    <div class="role-count">15</div>
+                                </div>
+                                <div class="role-permissions">
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Campaign approval
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Content moderation
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        User support
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--error-color);">❌</span>
+                                        Financial access
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline" onclick="editRole('manager')">Edit Role</button>
+                            </div>
+
+                            <div class="role-card">
+                                <div class="role-header">
+                                    <h3 class="role-title">Content Moderator</h3>
+                                    <div class="role-count">12</div>
+                                </div>
+                                <div class="role-permissions">
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Content review
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Report handling
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--error-color);">❌</span>
+                                        User management
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--error-color);">❌</span>
+                                        System settings
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline" onclick="editRole('moderator')">Edit Role</button>
+                            </div>
+
+                            <div class="role-card">
+                                <div class="role-header">
+                                    <h3 class="role-title">Analytics Viewer</h3>
+                                    <div class="role-count">8</div>
+                                </div>
+                                <div class="role-permissions">
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        View reports
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--success-color);">✅</span>
+                                        Export data
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--error-color);">❌</span>
+                                        Modify campaigns
+                                    </div>
+                                    <div class="permission-item">
+                                        <span style="color: var(--error-color);">❌</span>
+                                        User actions
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline" onclick="editRole('viewer')">Edit Role</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Reports -->
+                <div id="reportsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">📋 Smart Reports</h1>
+                        <p class="dashboard-subtitle">AI-generated reports with actionable insights</p>
+                    </div>
+
+                    <div class="advanced-stats-grid">
+                        <div class="advanced-stat-card" onclick="generateAIReport('executive')" style="cursor: pointer;">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Executive Summary</div>
+                                <div class="stat-icon-advanced">🤖</div>
+                            </div>
+                            <div class="stat-main-value">AI Generated</div>
+                            <div class="stat-secondary-value">Comprehensive platform overview with key insights</div>
+                            <div class="stat-trend-advanced">
+                                <span>🧠</span>
+                                Auto-updated daily
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card" onclick="generateAIReport('predictive')" style="cursor: pointer;">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Predictive Analysis</div>
+                                <div class="stat-icon-advanced">🔮</div>
+                            </div>
+                            <div class="stat-main-value">ML Powered</div>
+                            <div class="stat-secondary-value">Future trends and recommendations</div>
+                            <div class="stat-trend-advanced">
+                                <span>📈</span>
+                                96% accuracy rate
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card" onclick="generateAIReport('performance')" style="cursor: pointer;">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Performance Deep Dive</div>
+                                <div class="stat-icon-advanced">📊</div>
+                            </div>
+                            <div class="stat-main-value">Real-time</div>
+                            <div class="stat-secondary-value">Detailed performance metrics and KPIs</div>
+                            <div class="stat-trend-advanced">
+                                <span>⚡</span>
+                                Live data feed
+                            </div>
+                        </div>
+
+                        <div class="advanced-stat-card" onclick="generateAIReport('custom')" style="cursor: pointer;">
+                            <div class="stat-header-advanced">
+                                <div class="stat-title-advanced">Custom Report Builder</div>
+                                <div class="stat-icon-advanced">🛠️</div>
+                            </div>
+                            <div class="stat-main-value">Flexible</div>
+                            <div class="stat-secondary-value">Build custom reports with AI assistance</div>
+                            <div class="stat-trend-advanced">
+                                <span>🎨</span>
+                                Drag & drop interface
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div id="settingsPage" class="admin-page">
+                    <div class="dashboard-header">
+                        <h1 class="dashboard-title">⚙️ System Settings</h1>
+                        <p class="dashboard-subtitle">Configure platform settings and AI parameters</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <div class="settings-card-title">🤖 AI & Machine Learning</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">AI Confidence Threshold</label>
+                                <input type="range" min="70" max="95" value="87" class="form-input" id="aiConfidence" onchange="updateConfidenceValue(this.value)">
+                                <small style="color: #666;">Current: <span id="confidenceValue">87</span>% - Higher values increase accuracy but reduce automation</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Auto-Approval Limit (₹)</label>
+                                <input type="number" class="form-input" value="75000" id="approvalLimit">
+                                <small style="color: #666;">Maximum campaign amount for auto-approval</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">ML Model Update Frequency</label>
+                                <select class="form-select" id="modelUpdate">
+                                    <option value="realtime">Real-time - Continuous learning</option>
+                                    <option value="daily" selected>Daily - Balanced approach</option>
+                                    <option value="weekly">Weekly - Stable performance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-card-title">🔒 Security & Fraud Prevention</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Fraud Detection Sensitivity</label>
+                                <select class="form-select" id="fraudSensitivity">
+                                    <option value="low">Low - Fewer false positives</option>
+                                    <option value="medium">Medium - Balanced approach</option>
+                                    <option value="high" selected>High - Maximum security</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Risk Score Threshold</label>
+                                <input type="range" min="1" max="10" value="7" class="form-input" id="riskThreshold" onchange="updateRiskValue(this.value)">
+                                <small style="color: #666;">Current: <span id="riskValue">7</span>/10 - Actions triggered above this score</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Session Timeout (minutes)</label>
+                                <input type="number" class="form-input" value="30" id="sessionTimeout">
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-card-title">⚡ Performance & Automation</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Automation Processing Timeout</label>
+                                <input type="number" class="form-input" value="45" id="automationTimeout">
+                                <small style="color: #666;">Maximum time in seconds for automated processes</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Data Refresh Interval</label>
+                                <select class="form-select" id="refreshInterval">
+                                    <option value="1">1 second - Real-time</option>
+                                    <option value="5" selected>5 seconds - High frequency</option>
+                                    <option value="30">30 seconds - Standard</option>
+                                    <option value="60">1 minute - Conservative</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Cache Duration (hours)</label>
+                                <input type="number" class="form-input" value="24" id="cacheDuration">
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-card-title">📊 Analytics & Reporting</div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">AI Insight Generation</label>
+                                <select class="form-select" id="insightGeneration">
+                                    <option value="realtime" selected>Real-time - Continuous updates</option>
+                                    <option value="hourly">Hourly - Regular intervals</option>
+                                    <option value="daily">Daily - End-of-day summary</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Report Retention (days)</label>
+                                <input type="number" class="form-input" value="90" id="reportRetention">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Data Export Format</label>
+                                <select class="form-select" id="exportFormat">
+                                    <option value="csv">CSV - Comma separated</option>
+                                    <option value="json" selected>JSON - Structured data</option>
+                                    <option value="xlsx">Excel - Spreadsheet format</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn btn-outline" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
+                        <button class="btn btn-primary" onclick="saveAllSettings()" style="margin-left: 1rem;">💾 Save All Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Advanced Admin Application State
+        let advancedAdminData = {
+            currentPage: 'dashboard',
+            aiInsights: {
+                successPrediction: 89.3,
+                revenueForecast: 4200000,
+                riskScore: 'Low Risk',
+                optimizationScore: 96.7
+            },
+            automationRules: {
+                'campaign-approval': true,
+                'fraud-detection': true,
+                'donor-engagement': false,
+                'performance-opt': true,
+                'content-mod': false,
+                'recommendations': true
+            },
+            workflows: [],
+            settings: {},
+            notifications: []
+        };
+
+        // Initialize Advanced Admin Panel
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdvancedFeatures();
+            startAIInsightsUpdates();
+            loadRealtimeMetrics();
+            
+            // Start enhanced real-time updates
+            setInterval(updateAIInsights, 10000);
+            setInterval(updateRealtimeMetrics, 5000);
+            setInterval(updateAutomationStats, 15000);
+            
+            // Initialize tooltips and animations
+            initializeAnimations();
+        });
+
+        // Page Navigation Enhanced
+        function showAdminPage(pageId) {
+            // Update navigation
+            document.querySelectorAll('.admin-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.admin-page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                advancedAdminData.currentPage = pageId;
+                
+                // Page-specific initializations
+                switch(pageId) {
+                    case 'dashboard':
+                        updateAIInsights();
+                        break;
+                    case 'automation':
+                        loadAutomationCenter();
+                        break;
+                    case 'analytics':
+                        loadAdvancedAnalytics();
+                        break;
+                    case 'workflows':
+                        initializeWorkflowBuilder();
+                        break;
+                    case 'roles':
+                        loadRoleManagement();
+                        break;
+                    case 'reports':
+                        loadSmartReports();
+                        break;
+                    case 'settings':
+                        loadSystemSettings();
+                        break;
+                }
+            }
+        }
+
+        // AI Insights Functions
+        function initializeAdvancedFeatures() {
+            updateAIInsights();
+            loadAutomationStats();
+            initializePredictiveAnalytics();
+            showToast('🤖 AI systems initialized successfully', 'AI Engine Online', 'success');
+        }
+
+        function updateAIInsights() {
+            // Simulate AI-powered insights with realistic fluctuations
+            const insights = {
+                successPrediction: Math.min(95, 87 + Math.random() * 6),
+                revenueForecast: 4200000 + (Math.random() - 0.5) * 300000,
+                riskScore: Math.random() > 0.85 ? 'Medium Risk' : 'Low Risk',
+                optimizationScore: Math.min(98, 94 + Math.random() * 3)
+            };
+
+            // Update AI insight displays
+            const predictionEl = document.getElementById('aiSuccessPrediction');
+            const forecastEl = document.getElementById('aiRevenueForecast');
+            const riskEl = document.getElementById('aiRiskScore');
+            const optimizationEl = document.getElementById('aiOptimizationScore');
+
+            if (predictionEl) predictionEl.textContent = Math.round(insights.successPrediction) + '%';
+            if (forecastEl) forecastEl.textContent = '₹' + (insights.revenueForecast / 100000).toFixed(1) + 'M';
+            if (riskEl) riskEl.textContent = insights.riskScore;
+            if (optimizationEl) optimizationEl.textContent = insights.optimizationScore.toFixed(1) + '%';
+
+            // Update other metrics
+            const workflowsEl = document.getElementById('automatedWorkflows');
+            const accuracyEl = document.getElementById('mlAccuracy');
+            const speedEl = document.getElementById('processingSpeed');
+
+            if (workflowsEl) workflowsEl.textContent = Math.floor(45 + Math.random() * 5);
+            if (accuracyEl) accuracyEl.textContent = (93 + Math.random() * 3).toFixed(1) + '%';
+            if (speedEl) speedEl.textContent = (1.0 + Math.random() * 0.4).toFixed(1) + 's';
+
+            advancedAdminData.aiInsights = insights;
+        }
+
+        function startAIInsightsUpdates() {
+            setInterval(() => {
+                if (advancedAdminData.currentPage === 'dashboard') {
+                    updateAIInsights();
+                    
+                    // Occasionally show AI insights
+                    if (Math.random() > 0.7) {
+                        showAIToast();
+                    }
+                }
+            }, 25000);
+        }
+
+        function showAIToast() {
+            const messages = [
+                { title: 'AI Optimization', message: 'System performance improved by 2.3% through automated optimization', type: 'success' },
+                { title: 'Fraud Detection', message: 'Suspicious activity detected and automatically blocked', type: 'warning' },
+                { title: 'Predictive Model Update', message: 'Campaign success prediction accuracy increased to 94.8%', type: 'info' },
+                { title: 'Smart Automation', message: '12 new workflows deployed successfully', type: 'success' }
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            showToast('🤖 ' + randomMessage.message, randomMessage.title, randomMessage.type);
+        }
+
+        // Automation Functions
+        function toggleAutomation(toggleElement, automationId) {
+            const isActive = toggleElement.classList.contains('active');
+            const card = toggleElement.closest('.automation-card');
+            
+            if (isActive) {
+                toggleElement.classList.remove('active');
+                card.classList.remove('active');
+                advancedAdminData.automationRules[automationId] = false;
+                showToast('⚠️ Automation disabled', `${automationId.replace('-', ' ')} turned off`, 'warning');
+            } else {
+                toggleElement.classList.add('active');
+                card.classList.add('active');
+                advancedAdminData.automationRules[automationId] = true;
+                showToast('✅ Automation enabled', `${automationId.replace('-', ' ')} is now active`, 'success');
+            }
+
+            // Update automation stats
+            updateAutomationStats();
+        }
+
+        function createNewAutomation() {
+            showToast('🚀 Feature Coming Soon', 'Advanced automation builder will be available in the next update', 'info');
+        }
+
+        function loadAutomationCenter() {
+            // Simulate loading automation data
+            updateAutomationStats();
+            showToast('⚡ Automation Center loaded', 'All automation rules and workflows are up to date', 'success');
+        }
+
+        function updateAutomationStats() {
+            // Simulate real-time automation statistics updates
+            const activeAutomations = Object.values(advancedAdminData.automationRules).filter(Boolean).length;
+            
+            // Update any automation metrics if elements exist
+            console.log(`Active automations: ${activeAutomations}`);
+        }
+
+        // Workflow Builder Functions
+        function initializeWorkflowBuilder() {
+            showToast('🔄 Workflow Builder', 'Drag-and-drop workflow designer loaded', 'info');
+        }
+
+        function loadWorkflowTemplate() {
+            showToast('📋 Template Loaded', 'Campaign approval workflow template applied', 'success');
+        }
+
+        function saveWorkflow() {
+            showToast('💾 Workflow Saved', 'Your workflow has been saved successfully', 'success');
+        }
+
+        function deployWorkflow() {
+            showToast('🚀 Workflow Deployed', 'Your workflow is now active and processing events', 'success');
+        }
+
+        // Role Management Functions
+        function createNewRole() {
+            showToast('👤 New Role', 'Role creation wizard will open shortly', 'info');
+        }
+
+        function editRole(roleId) {
+            showToast('✏️ Edit Role', `Editing permissions for ${roleId} role`, 'info');
+        }
+
+        function loadRoleManagement() {
+            showToast('🔐 Roles Loaded', 'User roles and permissions synchronized', 'success');
+        }
+
+        // Reports Functions
+        function generateAIReport(reportType) {
+            const reportTypes = {
+                'executive': 'Executive Summary',
+                'predictive': 'Predictive Analysis',
+                'performance': 'Performance Deep Dive',
+                'custom': 'Custom Report Builder'
+            };
+
+            showToast('📊 Generating Report', `${reportTypes[reportType]} is being generated by AI...`, 'info');
+            
+            // Simulate report generation
+            setTimeout(() => {
+                showToast('✅ Report Ready', `${reportTypes[reportType]} has been generated successfully`, 'success');
+            }, 3000);
+        }
+
+        function loadSmartReports() {
+            showToast('📋 Smart Reports', 'AI-powered reporting system initialized', 'success');
+        }
+
+        // Settings Functions
+        function loadSystemSettings() {
+            showToast('⚙️ Settings Loaded', 'System configuration panel is ready', 'info');
+        }
+
+        function updateConfidenceValue(value) {
+            document.getElementById('confidenceValue').textContent = value;
+        }
+
+        function updateRiskValue(value) {
+            document.getElementById('riskValue').textContent = value;
+        }
+
+        function resetToDefaults() {
+            if (confirm('Are you sure you want to reset all settings to default values?')) {
+                // Reset form values
+                document.getElementById('aiConfidence').value = 85;
+                document.getElementById('approvalLimit').value = 50000;
+                document.getElementById('modelUpdate').value = 'daily';
+                document.getElementById('fraudSensitivity').value = 'medium';
+                document.getElementById('riskThreshold').value = 6;
+                document.getElementById('sessionTimeout').value = 30;
+                document.getElementById('automationTimeout').value = 30;
+                document.getElementById('refreshInterval').value = 5;
+                document.getElementById('cacheDuration').value = 24;
+                document.getElementById('insightGeneration').value = 'realtime';
+                document.getElementById('reportRetention').value = 90;
+                document.getElementById('exportFormat').value = 'json';
+                
+                // Update display values
+                updateConfidenceValue(85);
+                updateRiskValue(6);
+                
+                showToast('🔄 Settings Reset', 'All settings have been restored to default values', 'success');
+            }
+        }
+
+        function saveAllSettings() {
+            // Simulate saving settings
+            const settings = {
+                aiConfidence: document.getElementById('aiConfidence').value,
+                approvalLimit: document.getElementById('approvalLimit').value,
+                modelUpdate: document.getElementById('modelUpdate').value,
+                fraudSensitivity: document.getElementById('fraudSensitivity').value,
+                riskThreshold: document.getElementById('riskThreshold').value,
+                sessionTimeout: document.getElementById('sessionTimeout').value,
+                automationTimeout: document.getElementById('automationTimeout').value,
+                refreshInterval: document.getElementById('refreshInterval').value,
+                cacheDuration: document.getElementById('cacheDuration').value,
+                insightGeneration: document.getElementById('insightGeneration').value,
+                reportRetention: document.getElementById('reportRetention').value,
+                exportFormat: document.getElementById('exportFormat').value
+            };
+
+            advancedAdminData.settings = settings;
+            showToast('💾 Settings Saved', 'All system settings have been saved successfully', 'success');
+        }
+
+        // Analytics Functions
+        function loadAdvancedAnalytics() {
+            showToast('📊 Analytics Loading', 'Advanced analytics dashboard is processing data...', 'info');
+        }
+
+        // Real-time Metrics
+        function loadRealtimeMetrics() {
+            // Simulate real-time metric updates
+            updateMetrics();
+        }
+
+        function updateRealtimeMetrics() {
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            // This would connect to real-time data sources in a production environment
+            // For demo purposes, we're using simulated data updates
+        }
+
+        function initializePredictiveAnalytics() {
+            // Initialize ML models and predictive systems
+            console.log('Predictive analytics initialized');
+        }
+
+        function initializeAnimations() {
+            // Add subtle animations to enhance UX
+            const cards = document.querySelectorAll('.advanced-stat-card, .automation-card, .role-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Toast Notification System
+        function showToast(message, title = '', type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const toastContent = `
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            `;
+            
+            toast.innerHTML = toastContent;
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('adminSearchInput').focus();
+            }
+            
+            // ESC to close modals/notifications
+            if (e.key === 'Escape') {
+                const toasts = document.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                });
+            }
+        });
+
+        // Demo functionality - Remove in production
+        function simulateActivity() {
+            const activities = [
+                'New campaign "Help Children Education" approved automatically',
+                'Fraud attempt blocked by AI detection system',
+                'Weekly revenue report generated successfully',
+                'User role permissions updated for 3 users',
+                'Automation workflow deployed: Donor Thank You',
+                'System performance optimized: +15% efficiency'
+            ];
+            
+            const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+            showToast('📱 System Activity', randomActivity, 'info');
+        }
+
+        // Simulate activity every 30 seconds for demo
+        setInterval(simulateActivity, 30000);
+
+        // Initial welcome message
+        setTimeout(() => {
+            showToast('🚀 Welcome to Advanced Admin', 'Day 11 features loaded: AI automation, workflow builder, and intelligent insights', 'success');
+        }, 1000);
+    </script>
+</body>
+</html>

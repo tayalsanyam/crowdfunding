@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto - Real-Time Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --info-color: #17a2b8;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --gradient-success: linear-gradient(135deg, var(--success-color), #2ecc71);
+            --realtime-pulse: 0 0 20px rgba(231, 76, 60, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: var(--error-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            animation: livePulse 2s infinite;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 1px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .online-status {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success-color);
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Main Layout */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Real-Time Dashboard */
+        .realtime-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .realtime-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="realtimeGrid" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23realtimeGrid)"/></svg>');
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .realtime-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .realtime-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .realtime-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .realtime-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .realtime-stat {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            animation: countUp 1s ease;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        @keyframes countUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .live-badge {
+            background: var(--error-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            animation: livePulse 2s infinite;
+        }
+
+        /* Live Activity Feed */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .activity-feed {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .feed-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feed-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn.active,
+        .control-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .activity-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .activity-item:hover {
+            background: var(--light-color);
+            transform: translateX(5px);
+        }
+
+        .activity-item.new {
+            background: rgba(231, 76, 60, 0.05);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--realtime-pulse);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            color: var(--dark-color);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .activity-amount {
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        /* Real-Time Campaign Cards */
+        .campaign-realtime {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .campaign-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .realtime-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--success-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            animation: pulse 1s infinite;
+        }
+
+        .progress-realtime {
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-success);
+            border-radius: 6px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .campaign-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: var(--light-color);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-text {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        /* Integration Panels */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .integration-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .integration-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .integration-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .integration-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .integration-info h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .integration-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .integration-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .integration-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mini-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--light-color);
+            border-radius: 8px;
+        }
+
+        .mini-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .mini-stat-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Live Chat */
+        .live-chat {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-hover);
+            display: none;
+            flex-direction: column;
+            z-index: 1500;
+            overflow: hidden;
+        }
+
+        .live-chat.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-weight: 700;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            animation: messageSlide 0.3s ease;
+        }
+
+        .chat-message.own {
+            flex-direction: row-reverse;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .own .message-avatar {
+            background: var(--gradient-primary);
+        }
+
+        .message-content {
+            background: var(--light-color);
+            padding: 0.75rem;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .own .message-content {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Chat Toggle Button */
+        .chat-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-hover);
+            transition: all 0.3s ease;
+            z-index: 1400;
+            position: relative;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(231, 76, 60, 0.4);
+        }
+
+        .chat-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Webhook & API Sections */
+        .api-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .api-header {
+            margin-bottom: 2rem;
+        }
+
+        .api-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .api-description {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .endpoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .endpoint-item {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .method-get {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .method-post {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .method-put {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .method-delete {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--error-color);
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            background: var(--light-color);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Monitoring Dashboard */
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .metric-trend {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            color: var(--error-color);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: var(--dark-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-hover);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success-color);
+        }
+
+        .toast.error {
+            background: var(--error-color);
+        }
+
+        .toast.warning {
+            background: var(--warning-color);
+        }
+
+        .toast.info {
+            background: var(--info-color);
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .toast-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .realtime-title {
+                font-size: 2rem;
+            }
+
+            .realtime-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .integration-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .live-chat {
+                width: 100vw;
+                height: 100vh;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+            }
+
+            .campaign-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .monitoring-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading States */
+        .loading-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a class="logo" onclick="showPage('realtime')">
+                Ketto
+                <span class="live-indicator">
+                    <span class="live-dot"></span>
+                    Live
+                </span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a onclick="showPage('realtime')" class="active">🔴 Live Dashboard</a></li>
+                <li><a onclick="showPage('integrations')">🔗 Integrations</a></li>
+                <li><a onclick="showPage('webhooks')">⚡ Webhooks</a></li>
+                <li><a onclick="showPage('api')">🔧 API</a></li>
+                <li><a onclick="showPage('monitoring')">📊 Monitoring</a></li>
+            </ul>
+
+            <div class="user-menu">
+                <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatar">
+                    U
+                    <div class="online-status"></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Real-Time Dashboard -->
+        <div id="realtimePage" class="page active">
+            <div class="container">
+                <!-- Real-Time Header -->
+                <div class="realtime-header">
+                    <div class="realtime-content">
+                        <h1 class="realtime-title">
+                            🔴 Live Dashboard
+                            <span class="live-badge">
+                                <span class="live-dot"></span>
+                                Real-Time
+                            </span>
+                        </h1>
+                        <p class="realtime-subtitle">Monitor campaign activity, donations, and user engagement in real-time</p>
+                        
+                        <div class="realtime-stats">
+                            <div class="realtime-stat">
+                                <div class="stat-value" id="liveUsers">1,247</div>
+                                <div class="stat-label">Active Users</div>
+                            </div>
+                            <div class="realtime-stat">
+                                <div class="stat-value" id="liveDonations">₹45,230</div>
+                                <div class="stat-label">Donations Today</div>
+                            </div>
+                            <div class="realtime-stat">
+                                <div class="stat-value" id="liveViews">8,924</div>
+                                <div class="stat-label">Page Views</div>
+                            </div>
+                            <div class="realtime-stat">
+                                <div class="stat-value" id="liveConversions">3.2%</div>
+                                <div class="stat-label">Conversion Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Activity Feed -->
+                <div class="activity-grid">
+                    <div class="activity-feed">
+                        <div class="feed-header">
+                            <h2 class="feed-title">
+                                ⚡ Live Activity Feed
+                                <span class="live-badge">
+                                    <span class="live-dot"></span>
+                                    Live
+                                </span>
+                            </h2>
+                            <div class="feed-controls">
+                                <button class="control-btn active" onclick="filterActivity('all')">All</button>
+                                <button class="control-btn" onclick="filterActivity('donations')">Donations</button>
+                                <button class="control-btn" onclick="filterActivity('campaigns')">Campaigns</button>
+                                <button class="control-btn" onclick="filterActivity('users')">Users</button>
+                            </div>
+                        </div>
+                        <div class="activity-list" id="activityList">
+                            <!-- Activity items will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="campaign-realtime">
+                        <div class="campaign-header">
+                            <h3 class="campaign-title">Trending Campaign</h3>
+                            <div class="realtime-indicator">
+                                <span class="pulse-dot"></span>
+                                Live Updates
+                            </div>
+                        </div>
+                        
+                        <div class="progress-realtime">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="trendingProgress" style="width: 73%"></div>
+                            </div>
+                        </div>
+
+                        <div class="campaign-stats">
+                            <div class="stat-card">
+                                <div class="stat-number" id="trendingRaised">₹2.4L</div>
+                                <div class="stat-text">Raised</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="trendingDonors">156</div>
+                                <div class="stat-text">Donors</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="trendingDays">23</div>
+                                <div class="stat-text">Days Left</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrations Page -->
+        <div id="integrationsPage" class="page">
+            <div class="container">
+                <div class="realtime-header">
+                    <div class="realtime-content">
+                        <h1 class="realtime-title">🔗 Platform Integrations</h1>
+                        <p class="realtime-subtitle">Connect with third-party services and automate your crowdfunding workflow</p>
+                    </div>
+                </div>
+
+                <div class="integration-grid">
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">💳</div>
+                            <div class="integration-info">
+                                <h3>Payment Gateways</h3>
+                                <p>Razorpay, Stripe, PayPal integration</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">₹2.4M</div>
+                                <div class="mini-stat-label">Processed</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">99.8%</div>
+                                <div class="mini-stat-label">Uptime</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">📧</div>
+                            <div class="integration-info">
+                                <h3>Email Services</h3>
+                                <p>SendGrid, Mailchimp, AWS SES</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">48K</div>
+                                <div class="mini-stat-label">Emails Sent</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">78.5%</div>
+                                <div class="mini-stat-label">Open Rate</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">📱</div>
+                            <div class="integration-info">
+                                <h3>Social Media</h3>
+                                <p>Facebook, Twitter, Instagram, LinkedIn</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">2.1M</div>
+                                <div class="mini-stat-label">Reach</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">15.2K</div>
+                                <div class="mini-stat-label">Shares</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">📊</div>
+                            <div class="integration-info">
+                                <h3>Analytics</h3>
+                                <p>Google Analytics, Mixpanel, Amplitude</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">890K</div>
+                                <div class="mini-stat-label">Events</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">24/7</div>
+                                <div class="mini-stat-label">Tracking</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">💬</div>
+                            <div class="integration-info">
+                                <h3>Communication</h3>
+                                <p>Slack, Discord, Microsoft Teams</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">1.2K</div>
+                                <div class="mini-stat-label">Messages</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">12</div>
+                                <div class="mini-stat-label">Channels</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+
+                    <div class="integration-card">
+                        <div class="integration-header">
+                            <div class="integration-icon">🔒</div>
+                            <div class="integration-info">
+                                <h3>Security</h3>
+                                <p>Auth0, Firebase Auth, OAuth providers</p>
+                            </div>
+                        </div>
+                        <div class="integration-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">Connected</span>
+                        </div>
+                        <div class="integration-stats">
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">24K</div>
+                                <div class="mini-stat-label">Users</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-value">100%</div>
+                                <div class="mini-stat-label">Secure</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-block">Configure</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Webhooks Page -->
+        <div id="webhooksPage" class="page">
+            <div class="container">
+                <div class="realtime-header">
+                    <div class="realtime-content">
+                        <h1 class="realtime-title">⚡ Webhook Management</h1>
+                        <p class="realtime-subtitle">Configure real-time event notifications for your applications</p>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-header">
+                        <h2 class="api-title">Active Webhooks</h2>
+                        <p class="api-description">Monitor and manage your webhook endpoints</p>
+                    </div>
+
+                    <div class="endpoint-list">
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">https://your-app.com/webhooks/donation-received</div>
+                            <div class="endpoint-description">
+                                <strong>Event:</strong> donation.received<br>
+                                <strong>Status:</strong> <span style="color: var(--success-color);">Active</span><br>
+                                <strong>Last Delivery:</strong> 2 minutes ago
+                            </div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">https://your-app.com/webhooks/campaign-created</div>
+                            <div class="endpoint-description">
+                                <strong>Event:</strong> campaign.created<br>
+                                <strong>Status:</strong> <span style="color: var(--success-color);">Active</span><br>
+                                <strong>Last Delivery:</strong> 1 hour ago
+                            </div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">https://your-app.com/webhooks/goal-reached</div>
+                            <div class="endpoint-description">
+                                <strong>Event:</strong> campaign.goal_reached<br>
+                                <strong>Status:</strong> <span style="color: var(--warning-color);">Failed</span><br>
+                                <strong>Last Attempt:</strong> 15 minutes ago
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 2rem;" onclick="showMessage('Webhook configuration panel coming soon!')">Add New Webhook</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation Page -->
+        <div id="apiPage" class="page">
+            <div class="container">
+                <div class="realtime-header">
+                    <div class="realtime-content">
+                        <h1 class="realtime-title">🔧 API Documentation</h1>
+                        <p class="realtime-subtitle">RESTful API endpoints for integrating with the Ketto platform</p>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-header">
+                        <h2 class="api-title">Campaign Endpoints</h2>
+                        <p class="api-description">Manage campaigns programmatically</p>
+                    </div>
+
+                    <div class="endpoint-list">
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get">GET</span>
+                            <div class="endpoint-url">/api/v1/campaigns</div>
+                            <div class="endpoint-description">Retrieve all campaigns with pagination and filtering options</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">/api/v1/campaigns</div>
+                            <div class="endpoint-description">Create a new campaign with title, description, goal, and media</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get">GET</span>
+                            <div class="endpoint-url">/api/v1/campaigns/{id}</div>
+                            <div class="endpoint-description">Get detailed information about a specific campaign</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-put">PUT</span>
+                            <div class="endpoint-url">/api/v1/campaigns/{id}</div>
+                            <div class="endpoint-description">Update campaign details including status and content</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-header">
+                        <h2 class="api-title">Donation Endpoints</h2>
+                        <p class="api-description">Process and track donations</p>
+                    </div>
+
+                    <div class="endpoint-list">
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">/api/v1/donations</div>
+                            <div class="endpoint-description">Process a new donation with payment verification</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get">GET</span>
+                            <div class="endpoint-url">/api/v1/donations</div>
+                            <div class="endpoint-description">List all donations with filtering by campaign, user, or date</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get">GET</span>
+                            <div class="endpoint-url">/api/v1/donations/{id}</div>
+                            <div class="endpoint-description">Get detailed donation information including receipt data</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-header">
+                        <h2 class="api-title">User Management</h2>
+                        <p class="api-description">User authentication and profile management</p>
+                    </div>
+
+                    <div class="endpoint-list">
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">/api/v1/auth/login</div>
+                            <div class="endpoint-description">Authenticate user and return JWT token</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post">POST</span>
+                            <div class="endpoint-url">/api/v1/auth/register</div>
+                            <div class="endpoint-description">Create new user account with email verification</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get">GET</span>
+                            <div class="endpoint-url">/api/v1/users/profile</div>
+                            <div class="endpoint-description">Get current user profile information</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitoring Page -->
+        <div id="monitoringPage" class="page">
+            <div class="container">
+                <div class="realtime-header">
+                    <div class="realtime-content">
+                        <h1 class="realtime-title">📊 System Monitoring</h1>
+                        <p class="realtime-subtitle">Real-time platform health and performance metrics</p>
+                    </div>
+                </div>
+
+                <div class="monitoring-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">🚀</div>
+                        <div class="metric-value" id="systemUptime">99.98%</div>
+                        <div class="metric-label">System Uptime</div>
+                        <div class="metric-trend trend-up">↗ +0.02% this month</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-value" id="responseTime">142ms</div>
+                        <div class="metric-label">Avg Response Time</div>
+                        <div class="metric-trend trend-up">↗ -23ms improved</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">📡</div>
+                        <div class="metric-value" id="apiCalls">2.4M</div>
+                        <div class="metric-label">API Calls Today</div>
+                        <div class="metric-trend trend-up">↗ +12% vs yesterday</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🔥</div>
+                        <div class="metric-value" id="errorRate">0.02%</div>
+                        <div class="metric-label">Error Rate</div>
+                        <div class="metric-trend trend-down">↘ -0.01% this week</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">💾</div>
+                        <div class="metric-value" id="dbPerformance">98.5%</div>
+                        <div class="metric-label">Database Health</div>
+                        <div class="metric-trend trend-up">↗ Excellent</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🌐</div>
+                        <div class="metric-value" id="cdnHitRate">96.3%</div>
+                        <div class="metric-label">CDN Hit Rate</div>
+                        <div class="metric-trend trend-up">↗ +1.2% optimized</div>
+                    </div>
+                </div>
+
+                <div class="api-section">
+                    <div class="api-header">
+                        <h2 class="api-title">🔍 System Alerts</h2>
+                        <p class="api-description">Recent system events and notifications</p>
+                    </div>
+
+                    <div class="endpoint-list">
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get" style="background: rgba(39, 174, 96, 0.1); color: var(--success-color);">INFO</span>
+                            <div class="endpoint-url">System backup completed successfully</div>
+                            <div class="endpoint-description">Daily backup process finished at 02:00 UTC • 2 hours ago</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-post" style="background: rgba(243, 156, 18, 0.1); color: var(--warning-color);">WARN</span>
+                            <div class="endpoint-url">High API usage detected</div>
+                            <div class="endpoint-description">API calls exceeded 80% of rate limit • 15 minutes ago</div>
+                        </div>
+
+                        <div class="endpoint-item">
+                            <span class="endpoint-method method-get" style="background: rgba(39, 174, 96, 0.1); color: var(--success-color);">INFO</span>
+                            <div class="endpoint-url">Security scan completed</div>
+                            <div class="endpoint-description">Weekly security audit passed with no issues • 1 day ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Live Chat -->
+    <div class="live-chat" id="liveChat">
+        <div class="chat-header">
+            <div class="chat-title">Live Support</div>
+            <div class="chat-status">
+                <span class="pulse-dot"></span>
+                Online
+            </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message">
+                <div class="message-avatar">S</div>
+                <div class="message-content">
+                    Hi! I'm here to help you with any questions about the real-time features. How can I assist you today?
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+            <button class="send-btn" onclick="sendChatMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button class="chat-toggle" onclick="toggleChat()" id="chatToggle">
+        💬
+        <span class="chat-notification" id="chatNotification">3</span>
+    </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Application State
+        let currentUser = { 
+            id: 1, 
+            name: "Demo User", 
+            email: "demo@ketto.com"
+        };
+
+        let liveActivityData = [];
+        let chatMessages = [];
+        let realtimeIntervals = [];
+        let currentFilter = 'all';
+
+        // Initialize Real-Time Platform
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            initializeRealTimeFeatures();
+            startLiveUpdates();
+            generateInitialActivity();
+            showPage('realtime');
+        });
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+        }
+
+        // Real-Time Features
+        function initializeRealTimeFeatures() {
+            // Simulate real-time data updates
+            updateLiveStats();
+            
+            // Start activity feed updates
+            setInterval(generateLiveActivity, 3000);
+            
+            // Update trending campaign
+            setInterval(updateTrendingCampaign, 5000);
+            
+            // System health monitoring
+            setInterval(updateSystemMetrics, 10000);
+        }
+
+        function startLiveUpdates() {
+            // Simulate live user count changes
+            setInterval(() => {
+                const users = document.getElementById('liveUsers');
+                const currentCount = parseInt(users.textContent.replace(',', ''));
+                const newCount = currentCount + Math.floor(Math.random() * 10) - 5;
+                users.textContent = Math.max(1000, newCount).toLocaleString();
+            }, 2000);
+
+            // Update donations in real-time
+            setInterval(() => {
+                const donations = document.getElementById('liveDonations');
+                const currentAmount = parseInt(donations.textContent.replace('₹', '').replace(',', ''));
+                const newAmount = currentAmount + Math.floor(Math.random() * 500);
+                donations.textContent = '₹' + newAmount.toLocaleString();
+            }, 4000);
+
+            // Update page views
+            setInterval(() => {
+                const views = document.getElementById('liveViews');
+                const currentViews = parseInt(views.textContent.replace(',', ''));
+                const newViews = currentViews + Math.floor(Math.random() * 20);
+                views.textContent = newViews.toLocaleString();
+            }, 1500);
+        }
+
+        function updateLiveStats() {
+            // Simulate live statistics updates
+            const stats = {
+                users: 1247 + Math.floor(Math.random() * 100),
+                donations: 45230 + Math.floor(Math.random() * 1000),
+                views: 8924 + Math.floor(Math.random() * 200),
+                conversions: (3.2 + (Math.random() - 0.5) * 0.5).toFixed(1)
+            };
+
+            document.getElementById('liveUsers').textContent = stats.users.toLocaleString();
+            document.getElementById('liveDonations').textContent = '₹' + stats.donations.toLocaleString();
+            document.getElementById('liveViews').textContent = stats.views.toLocaleString();
+            document.getElementById('liveConversions').textContent = stats.conversions + '%';
+        }
+
+        function generateInitialActivity() {
+            const activities = [
+                {
+                    type: 'donation',
+                    user: 'Amit Sharma',
+                    action: 'donated ₹5,000 to',
+                    target: 'Help Rahul Fight Cancer',
+                    time: '2 minutes ago',
+                    amount: '₹5,000'
+                },
+                {
+                    type: 'campaign',
+                    user: 'Priya Patel',
+                    action: 'created a new campaign',
+                    target: 'Education for Rural Children',
+                    time: '5 minutes ago'
+                },
+                {
+                    type: 'donation',
+                    user: 'Rajesh Kumar',
+                    action: 'donated ₹2,500 to',
+                    target: 'Flood Relief Kerala',
+                    time: '8 minutes ago',
+                    amount: '₹2,500'
+                },
+                {
+                    type: 'user',
+                    user: 'Meera Singh',
+                    action: 'joined the platform',
+                    target: '',
+                    time: '12 minutes ago'
+                },
+                {
+                    type: 'donation',
+                    user: 'Suresh Reddy',
+                    action: 'donated ₹10,000 to',
+                    target: 'Medical Emergency Fund',
+                    time: '15 minutes ago',
+                    amount: '₹10,000'
+                }
+            ];
+
+            liveActivityData = activities;
+            renderActivityFeed();
+        }
+
+        function generateLiveActivity() {
+            const newActivities = [
+                {
+                    type: 'donation',
+                    user: getRandomName(),
+                    action: 'donated ₹' + getRandomAmount() + ' to',
+                    target: getRandomCampaign(),
+                    time: 'Just now',
+                    amount: '₹' + getRandomAmount(),
+                    isNew: true
+                },
+                {
+                    type: 'campaign',
+                    user: getRandomName(),
+                    action: 'created a new campaign',
+                    target: getRandomCampaign(),
+                    time: 'Just now',
+                    isNew: true
+                },
+                {
+                    type: 'user',
+                    user: getRandomName(),
+                    action: 'joined the platform',
+                    target: '',
+                    time: 'Just now',
+                    isNew: true
+                }
+            ];
+
+            // Add a random new activity
+            const newActivity = newActivities[Math.floor(Math.random() * newActivities.length)];
+            liveActivityData.unshift(newActivity);
+            
+            // Keep only the latest 20 activities
+            if (liveActivityData.length > 20) {
+                liveActivityData = liveActivityData.slice(0, 20);
+            }
+
+            renderActivityFeed();
+            showToast('New Activity', newActivity.user + ' ' + newActivity.action + ' ' + newActivity.target, 'info');
+        }
+
+        function getRandomName() {
+            const names = ['Arjun Mehta', 'Kavya Sharma', 'Rohit Gupta', 'Sneha Patel', 'Vikram Singh', 'Anita Rao', 'Karan Joshi', 'Pooja Nair'];
+            return names[Math.floor(Math.random() * names.length)];
+        }
+
+        function getRandomAmount() {
+            const amounts = [500, 1000, 2500, 5000, 7500, 10000, 15000, 25000];
+            return amounts[Math.floor(Math.random() * amounts.length)];
+        }
+
+        function getRandomCampaign() {
+            const campaigns = [
+                'Help Build School in Village',
+                'Medical Emergency Fund',
+                'Disaster Relief Operations',
+                'Animal Rescue Mission',
+                'Clean Water Initiative',
+                'Education for All',
+                'Healthcare Access Project',
+                'Environmental Conservation'
+            ];
+            return campaigns[Math.floor(Math.random() * campaigns.length)];
+        }
+
+        function renderActivityFeed() {
+            const activityList = document.getElementById('activityList');
+            const filteredActivities = currentFilter === 'all' ? liveActivityData : 
+                liveActivityData.filter(activity => activity.type === currentFilter);
+
+            activityList.innerHTML = filteredActivities.map((activity, index) => `
+                <div class="activity-item ${activity.isNew ? 'new' : ''}" style="animation-delay: ${index * 0.1}s">
+                    <div class="activity-avatar">${activity.user.charAt(0)}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">
+                            <strong>${activity.user}</strong> ${activity.action} 
+                            ${activity.target ? '<strong>' + activity.target + '</strong>' : ''}
+                            ${activity.amount ? '<span class="activity-amount">' + activity.amount + '</span>' : ''}
+                        </div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Remove 'new' class after animation
+            setTimeout(() => {
+                liveActivityData.forEach(activity => activity.isNew = false);
+            }, 1000);
+        }
+
+        function filterActivity(type) {
+            currentFilter = type;
+            
+            // Update active button
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderActivityFeed();
+        }
+
+        function updateTrendingCampaign() {
+            // Simulate trending campaign updates
+            const progressBar = document.getElementById('trendingProgress');
+            const raised = document.getElementById('trendingRaised');
+            const donors = document.getElementById('trendingDonors');
+            const days = document.getElementById('trendingDays');
+
+            const currentProgress = parseInt(progressBar.style.width) || 73;
+            const newProgress = Math.min(100, currentProgress + Math.random() * 2);
+            
+            progressBar.style.width = newProgress + '%';
+            
+            // Update stats
+            const currentRaised = parseFloat(raised.textContent.replace('₹', '').replace('L', '')) * 100000;
+            const newRaised = currentRaised + Math.floor(Math.random() * 5000);
+            raised.textContent = '₹' + (newRaised / 100000).toFixed(1) + 'L';
+
+            const currentDonors = parseInt(donors.textContent);
+            const newDonors = currentDonors + Math.floor(Math.random() * 3);
+            donors.textContent = newDonors;
+
+            const currentDays = parseInt(days.textContent);
+            if (Math.random() > 0.9 && currentDays > 1) {
+                days.textContent = currentDays - 1;
+            }
+        }
+
+        function updateSystemMetrics() {
+            // Simulate system metrics updates
+            const metrics = {
+                uptime: (99.98 + (Math.random() - 0.5) * 0.01).toFixed(2) + '%',
+                responseTime: Math.floor(142 + (Math.random() - 0.5) * 20) + 'ms',
+                apiCalls: (2.4 + (Math.random() - 0.5) * 0.2).toFixed(1) + 'M',
+                errorRate: (0.02 + (Math.random() - 0.5) * 0.01).toFixed(3) + '%',
+                dbHealth: (98.5 + (Math.random() - 0.5) * 1).toFixed(1) + '%',
+                cdnHitRate: (96.3 + (Math.random() - 0.5) * 1).toFixed(1) + '%'
+            };
+
+            document.getElementById('systemUptime').textContent = metrics.uptime;
+            document.getElementById('responseTime').textContent = metrics.responseTime;
+            document.getElementById('apiCalls').textContent = metrics.apiCalls;
+            document.getElementById('errorRate').textContent = metrics.errorRate;
+            document.getElementById('dbPerformance').textContent = metrics.dbHealth;
+            document.getElementById('cdnHitRate').textContent = metrics.cdnHitRate;
+        }
+
+        // Chat Functions
+        function toggleChat() {
+            const chat = document.getElementById('liveChat');
+            const toggle = document.getElementById('chatToggle');
+            const notification = document.getElementById('chatNotification');
+            
+            chat.classList.toggle('active');
+            
+            if (chat.classList.contains('active')) {
+                toggle.style.display = 'none';
+                notification.style.display = 'none';
+            } else {
+                toggle.style.display = 'flex';
+                notification.style.display = 'flex';
+            }
+        }
+
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addChatMessage(message, true);
+                input.value = '';
+                
+                // Simulate response
+                setTimeout(() => {
+                    const responses = [
+                        "Thanks for your message! I'm here to help with any questions about our real-time features.",
+                        "That's a great question! Our live dashboard updates every few seconds to show the latest activity.",
+                        "You can filter the activity feed by clicking on the filter buttons above the feed.",
+                        "Our real-time system processes over 2.4M API calls daily with 99.98% uptime!",
+                        "Is there anything specific about the real-time features you'd like to know more about?"
+                    ];
+                    const response = responses[Math.floor(Math.random() * responses.length)];
+                    addChatMessage(response, false);
+                }, 1000);
+            }
+        }
+
+        function addChatMessage(message, isOwn) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isOwn ? 'own' : ''}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${isOwn ? 'U' : 'S'}</div>
+                <div class="message-content">
+                    ${message}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Toast Notifications
+        function showToast(title, message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type]}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="closeToast(this)">×</button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function closeToast(button) {
+            const toast = button.parentElement;
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        function showMessage(message) {
+            showToast('Information', message, 'info');
+        }
+
+        // User Functions
+        function loadUserData() {
+            const userData = localStorage.getItem('kettoUser');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        function toggleUserMenu() {
+            showToast('User Menu', 'User profile and settings coming soon!', 'info');
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            // Add some initial chat messages
+            setTimeout(() => {
+                addChatMessage("Welcome to Ketto's real-time platform! How can I help you today?", false);
+            }, 2000);
+
+            // Show welcome toast
+            setTimeout(() => {
+                showToast('Welcome!', 'Real-time dashboard is now active', 'success');
+            }, 1000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // ESC to close chat
+            if (event.key === 'Escape') {
+                const chat = document.getElementById('liveChat');
+                if (chat.classList.contains('active')) {
+                    toggleChat();
+                }
+            }
+            
+            // Ctrl/Cmd + K to open chat
+            if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+                event.preventDefault();
+                const chat = document.getElementById('liveChat');
+                if (!chat.classList.contains('active')) {
+                    toggleChat();
+                }
+                document.getElementById('chatInput').focus();
+            }
+        });
+
+        // Simulate random system events
+        setInterval(() => {
+            const events = [
+                { title: 'New User Registration', message: 'A new user just joined the platform', type: 'success' },
+                { title: 'Campaign Goal Reached', message: 'A campaign just reached its funding goal!', type: 'success' },
+                { title: 'High Traffic Alert', message: 'Platform experiencing high traffic volume', type: 'warning' },
+                { title: 'System Update', message: 'Real-time features have been optimized', type: 'info' }
+            ];
+            
+            const event = events[Math.floor(Math.random() * events.length)];
+            if (Math.random() > 0.7) { // 30% chance
+                showToast(event.title, event.message, event.type);
+            }
+        }, 15000);
+
+        // Update chat notification count
+        let notificationCount = 3;
+        setInterval(() => {
+            if (Math.random() > 0.8) {
+                notificationCount++;
+                document.getElementById('chatNotification').textContent = notificationCount;
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
+
+        

@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto Backend & API - Day 12</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --info-color: #17a2b8;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), #c0392b);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            --gradient-success: linear-gradient(135deg, var(--success-color), #2ecc71);
+            --api-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --backend-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --integration-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .logo .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab.active,
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Page Headers */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-hover);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            background: var(--gradient-primary);
+        }
+
+        .card-icon.api { background: var(--api-gradient); }
+        .card-icon.backend { background: var(--backend-gradient); }
+        .card-icon.integration { background: var(--integration-gradient); }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .card-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--light-color);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* API Endpoint List */
+        .api-list {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .api-endpoint {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .api-endpoint:hover {
+            background: var(--light-color);
+        }
+
+        .api-endpoint:last-child {
+            border-bottom: none;
+        }
+
+        .api-method {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-right: 1rem;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .api-method.get { background: var(--success-color); color: white; }
+        .api-method.post { background: var(--secondary-color); color: white; }
+        .api-method.put { background: var(--warning-color); color: white; }
+        .api-method.delete { background: var(--error-color); color: white; }
+
+        .api-path {
+            flex: 1;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 1rem;
+            color: var(--dark-color);
+            margin-right: 1rem;
+        }
+
+        .api-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .api-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 2rem;
+            border-radius: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .code-title {
+            color: #81c784;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: var(--gradient-secondary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        /* Integration Cards */
+        .integration-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .integration-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .integration-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .integration-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .integration-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .integration-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .integration-status.connected {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .integration-status.available {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Monitor Panel */
+        .monitor-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .monitor-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .monitor-logs {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            height: 300px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .log-timestamp {
+            color: #81c784;
+            margin-right: 1rem;
+        }
+
+        .log-level {
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .log-level.info { background: var(--secondary-color); }
+        .log-level.success { background: var(--success-color); }
+        .log-level.warning { background: var(--warning-color); }
+        .log-level.error { background: var(--error-color); }
+
+        .log-message {
+            color: #cbd5e0;
+        }
+
+        /* Performance Metrics */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .performance-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .performance-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .performance-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .performance-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            min-width: 350px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .api-endpoint {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .api-status {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🛡️ Ketto Backend</h1>
+                <span class="badge">Day 12 - API & Integration</span>
+            </div>
+            
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="showPage('overview')">📊 Overview</button>
+                <button class="nav-tab" onclick="showPage('api')">🔌 API Explorer</button>
+                <button class="nav-tab" onclick="showPage('database')">🗄️ Database</button>
+                <button class="nav-tab" onclick="showPage('integrations')">🔗 Integrations</button>
+                <button class="nav-tab" onclick="showPage('monitoring')">📈 Monitoring</button>
+                <button class="nav-tab" onclick="showPage('security')">🔒 Security</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Overview Page -->
+        <div id="overviewPage" class="page active">
+            <div class="page-header">
+                <h1 class="page-title">Backend & API Overview</h1>
+                <p class="page-subtitle">Complete backend simulation with RESTful APIs, database management, and third-party integrations</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRequests">24,847</div>
+                    <div class="stat-label">Total API Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgResponseTime">127ms</div>
+                    <div class="stat-label">Avg Response Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uptime">99.98%</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeConnections">1,247</div>
+                    <div class="stat-label">Active Connections</div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon api">🔌</div>
+                        <div>
+                            <div class="card-title">RESTful API System</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Complete REST API with 47 endpoints covering authentication, campaigns, donations, users, and administrative functions. Includes rate limiting, caching, and comprehensive error handling.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">47</div>
+                            <div class="stat-label">Endpoints</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">v2.1</div>
+                            <div class="stat-label">API Version</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">100%</div>
+                            <div class="stat-label">Documented</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showPage('api')">🔍 Explore APIs</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon backend">🗄️</div>
+                        <div>
+                            <div class="card-title">Database Management</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Advanced database architecture with MongoDB simulation, Redis caching, automated backups, and real-time data synchronization across all platform components.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Collections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">847K</div>
+                            <div class="stat-label">Documents</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">2.4GB</div>
+                            <div class="stat-label">Data Size</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showPage('database')">🗂️ Manage Database</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon integration">🔗</div>
+                        <div>
+                            <div class="card-title">Third-Party Integrations</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Seamless integration with payment gateways, email services, SMS providers, social media platforms, and analytics tools. Webhook support for real-time event processing.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Integrations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">Webhooks</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showPage('integrations')">🔌 View Integrations</button>
+                </div>
+            </div>
+
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <div class="performance-value" id="requestsPerSecond">847</div>
+                    <div class="performance-label">Requests/Second</div>
+                    <div class="performance-trend">📈 +12% vs yesterday</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="errorRate">0.02%</div>
+                    <div class="performance-label">Error Rate</div>
+                    <div class="performance-trend">📉 -0.01% improvement</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="cacheHitRate">94.7%</div>
+                    <div class="performance-label">Cache Hit Rate</div>
+                    <div class="performance-trend">📈 +2.1% optimized</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="dbConnections">156</div>
+                    <div class="performance-label">DB Connections</div>
+                    <div class="performance-trend">⚡ Optimal pool size</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Explorer Page -->
+        <div id="apiPage" class="page">
+            <div class="page-header">
+                <h1 class="page-title">API Explorer</h1>
+                <p class="page-subtitle">Complete RESTful API documentation with interactive testing capabilities</p>
+            </div>
+
+            <div class="api-list">
+                <div class="api-endpoint" onclick="showApiDetails('users-profile')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/users/profile</div>
+                    <div class="api-description">Get current user profile information</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('users-update')">
+                    <div class="api-method put">PUT</div>
+                    <div class="api-path">/api/v2/users/profile</div>
+                    <div class="api-description">Update user profile and preferences</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('analytics-dashboard')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/analytics/dashboard</div>
+                    <div class="api-description">Comprehensive analytics and metrics data</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('admin-users')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/admin/users</div>
+                    <div class="api-description">Admin endpoint for user management</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('webhooks-register')">
+                    <div class="api-method post">POST</div>
+                    <div class="api-path">/api/v2/webhooks/register</div>
+                    <div class="api-description">Register webhook endpoints for events</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block" id="apiExample">
+                <div class="code-header">
+                    <div class="code-title">Example API Request - Create Campaign</div>
+                    <button class="copy-btn" onclick="copyCode('securityConfig')">📋 Copy</button>
+                </div>
+                <pre><code>// Security Configuration
+const securityConfig = {
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: '24h',
+    algorithm: 'HS256',
+    issuer: 'ketto-api',
+    audience: 'ketto-client'
+  },
+  
+  encryption: {
+    algorithm: 'aes-256-gcm',
+    keyDerivation: 'pbkdf2',
+    iterations: 100000,
+    saltLength: 32,
+    tagLength: 16
+  },
+  
+  rateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP',
+    standardHeaders: true,
+    legacyHeaders: false
+  },
+  
+  cors: {
+    origin: ['https://ketto.org', 'https://app.ketto.org'],
+    credentials: true,
+    optionsSuccessStatus: 200
+  },
+  
+  helmet: {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'"]
+      }
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    }
+  }
+};
+
+// Authentication Middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  jwt.verify(token, securityConfig.jwt.secret, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// Data Encryption
+const encryptSensitiveData = (data) => {
+  const salt = crypto.randomBytes(securityConfig.encryption.saltLength);
+  const key = crypto.pbkdf2Sync(
+    process.env.ENCRYPTION_PASSWORD,
+    salt,
+    securityConfig.encryption.iterations,
+    32,
+    'sha256'
+  );
+  
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipher(securityConfig.encryption.algorithm, key);
+  cipher.setAAD(Buffer.from('ketto-platform'));
+  
+  let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  
+  const tag = cipher.getAuthTag();
+  
+  return {
+    encrypted,
+    salt: salt.toString('hex'),
+    iv: iv.toString('hex'),
+    tag: tag.toString('hex')
+  };
+};</code></pre>
+            </div>
+
+            <div class="monitor-panel">
+                <div class="monitor-header">
+                    <div class="monitor-title">🚨 Security Event Log</div>
+                </div>
+                <div class="monitor-logs" id="securityLogs">
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:45</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">User login: user@example.com - 2FA verified - IP: 203.192.123.45</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:42</span>
+                        <span class="log-level warning">WARNING</span>
+                        <span class="log-message">Suspicious login pattern detected: 5 attempts from different locations</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:38</span>
+                        <span class="log-level error">BLOCKED</span>
+                        <span class="log-message">SQL injection attempt blocked: IP 185.234.219.41 - Auto-banned</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:35</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">SSL certificate renewed: ketto.org - Valid until 2026-01-15</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:32</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">Payment data encrypted: Transaction ID pay_FH4xocGGGGhGGhGG</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:30:29</span>
+                        <span class="log-level warning">WARNING</span>
+                        <span class="log-message">Rate limit exceeded: API endpoint /api/v2/campaigns - IP rate limited</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Application State
+        let backendData = {
+            currentPage: 'overview',
+            apiStats: {
+                totalRequests: 24847,
+                avgResponseTime: 127,
+                uptime: 99.98,
+                activeConnections: 1247
+            },
+            performanceMetrics: {
+                requestsPerSecond: 847,
+                errorRate: 0.02,
+                cacheHitRate: 94.7,
+                dbConnections: 156
+            },
+            logs: [],
+            integrations: {}
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeBackendSystem();
+            startRealTimeUpdates();
+            loadSystemMetrics();
+            
+            // Start monitoring updates
+            setInterval(updateMetrics, 3000);
+            setInterval(addSystemLog, 5000);
+            setInterval(updatePerformanceMetrics, 8000);
+        });
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Update navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                backendData.currentPage = pageId;
+                
+                // Page-specific initializations
+                switch(pageId) {
+                    case 'overview':
+                        loadOverviewData();
+                        break;
+                    case 'api':
+                        loadApiExplorer();
+                        break;
+                    case 'database':
+                        loadDatabaseMonitor();
+                        break;
+                    case 'integrations':
+                        loadIntegrations();
+                        break;
+                    case 'monitoring':
+                        loadSystemMonitoring();
+                        break;
+                    case 'security':
+                        loadSecurityDashboard();
+                        break;
+                }
+            }
+        }
+
+        // Initialize Backend System
+        function initializeBackendSystem() {
+            updateSystemStats();
+            showToast('🚀 Backend System Initialized', 'All services are online and operational', 'success');
+        }
+
+        function startRealTimeUpdates() {
+            // Start real-time data updates
+            setInterval(() => {
+                updateSystemStats();
+                if (backendData.currentPage === 'monitoring') {
+                    updateMonitoringLogs();
+                }
+                if (backendData.currentPage === 'security') {
+                    updateSecurityLogs();
+                }
+                if (backendData.currentPage === 'database') {
+                    updateDatabaseLogs();
+                }
+            }, 2000);
+        }
+
+        function loadSystemMetrics() {
+            // Load initial system metrics
+            updateMetrics();
+        }
+
+        // Page-specific functions
+        function loadOverviewData() {
+            updateSystemStats();
+            showToast('📊 Overview Loaded', 'System metrics and performance data updated', 'info');
+        }
+
+        function loadApiExplorer() {
+            showToast('🔌 API Explorer', 'Interactive API documentation loaded', 'info');
+        }
+
+        function loadDatabaseMonitor() {
+            updateDatabaseLogs();
+            showToast('🗄️ Database Monitor', 'Database performance metrics loaded', 'info');
+        }
+
+        function loadIntegrations() {
+            showToast('🔗 Integrations', 'Third-party integration status updated', 'info');
+        }
+
+        function loadSystemMonitoring() {
+            updateMonitoringLogs();
+            showToast('📈 System Monitoring', 'Real-time performance monitoring active', 'info');
+        }
+
+        function loadSecurityDashboard() {
+            updateSecurityLogs();
+            showToast('🔒 Security Dashboard', 'Security monitoring and threat detection active', 'info');
+        }
+
+        // Metrics Updates
+        function updateMetrics() {
+            // Update overview stats
+            const stats = backendData.apiStats;
+            stats.totalRequests += Math.floor(Math.random() * 50) + 10;
+            stats.avgResponseTime = Math.max(100, stats.avgResponseTime + (Math.random() - 0.5) * 20);
+            stats.activeConnections = Math.max(1000, stats.activeConnections + Math.floor((Math.random() - 0.5) * 100));
+            
+            // Update UI elements
+            updateElement('totalRequests', stats.totalRequests.toLocaleString());
+            updateElement('avgResponseTime', Math.round(stats.avgResponseTime) + 'ms');
+            updateElement('uptime', stats.uptime.toFixed(2) + '%');
+            updateElement('activeConnections', stats.activeConnections.toLocaleString());
+            
+            // Update performance metrics
+            const perf = backendData.performanceMetrics;
+            perf.requestsPerSecond = Math.max(700, perf.requestsPerSecond + Math.floor((Math.random() - 0.5) * 100));
+            perf.errorRate = Math.max(0.01, perf.errorRate + (Math.random() - 0.5) * 0.01);
+            perf.cacheHitRate = Math.min(99, Math.max(90, perf.cacheHitRate + (Math.random() - 0.5) * 2));
+            
+            updateElement('requestsPerSecond', perf.requestsPerSecond);
+            updateElement('errorRate', perf.errorRate.toFixed(2) + '%');
+            updateElement('cacheHitRate', perf.cacheHitRate.toFixed(1) + '%');
+            updateElement('dbConnections', perf.dbConnections);
+        }
+
+        function updatePerformanceMetrics() {
+            // Update monitoring page metrics
+            updateElement('monitorCpuUsage', (20 + Math.random() * 15).toFixed(1) + '%');
+            updateElement('monitorMemoryUsage', (4.0 + Math.random() * 0.5).toFixed(1) + 'GB');
+            updateElement('monitorDiskUsage', (1.8 + Math.random() * 0.1).toFixed(1) + 'TB');
+            updateElement('monitorNetworkIO', Math.floor(800 + Math.random() * 100) + 'MB/s');
+        }
+
+        function updateSystemStats() {
+            // Simulate real-time system statistics updates
+            const stats = backendData.apiStats;
+            
+            // Small random fluctuations
+            stats.totalRequests += Math.floor(Math.random() * 5) + 1;
+            stats.avgResponseTime = Math.max(100, stats.avgResponseTime + (Math.random() - 0.5) * 10);
+            stats.activeConnections = Math.max(1000, stats.activeConnections + Math.floor((Math.random() - 0.5) * 50));
+            
+            // Update performance metrics
+            const perf = backendData.performanceMetrics;
+            perf.requestsPerSecond = Math.max(700, perf.requestsPerSecond + Math.floor((Math.random() - 0.5) * 50));
+        }
+
+        // Log Management
+        function addSystemLog() {
+            const logTypes = ['info', 'success', 'warning', 'error'];
+            const messages = [
+                'API Request: GET /api/v2/campaigns - {time}ms - 200 OK',
+                'Payment webhook processed: Razorpay payment_captured - ₹{amount}',
+                'Cache hit: campaigns:active:page:{page} - {time}ms response',
+                'Rate limit approached: User {user} - {count}/100 requests',
+                'Email sent: Thank you for donation - {email}',
+                'Background job: {job} started',
+                'Database query: {query} - {time}ms',
+                'Security scan completed: No vulnerabilities found'
+            ];
+            
+            const randomType = logTypes[Math.floor(Math.random() * logTypes.length)];
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)]
+                .replace('{time}', Math.floor(Math.random() * 200) + 50)
+                .replace('{amount}', (Math.floor(Math.random() * 10) + 1) * 1000)
+                .replace('{page}', Math.floor(Math.random() * 5) + 1)
+                .replace('{user}', 'usr_' + Math.random().toString(36).substr(2, 8))
+                .replace('{count}', Math.floor(Math.random() * 30) + 70)
+                .replace('{email}', 'user@example.com')
+                .replace('{job}', ['Analytics aggregation', 'Backup process', 'Email queue'][Math.floor(Math.random() * 3)])
+                .replace('{query}', ['SELECT * FROM campaigns', 'UPDATE donations SET', 'INSERT INTO users'][Math.floor(Math.random() * 3)]);
+            
+            const timestamp = new Date().toISOString().replace('T', ' ').substr(0, 19);
+            
+            // Add to appropriate log containers
+            if (backendData.currentPage === 'monitoring') {
+                addLogEntry('systemLogs', timestamp, randomType, randomMessage);
+            }
+        }
+
+        function updateMonitoringLogs() {
+            // Add monitoring-specific logs
+            const monitoringMessages = [
+                'CPU usage: Normal load - 23.7%',
+                'Memory utilization: 4.2GB / 6GB (67%)',
+                'Disk I/O: Read 234MB/s, Write 156MB/s',
+                'Network throughput: 847MB/s',
+                'Active database connections: 156/200',
+                'Cache performance: 94.7% hit rate'
+            ];
+            
+            const message = monitoringMessages[Math.floor(Math.random() * monitoringMessages.length)];
+            const timestamp = new Date().toISOString().replace('T', ' ').substr(0, 19);
+            addLogEntry('systemLogs', timestamp, 'info', message);
+        }
+
+        function updateDatabaseLogs() {
+            const dbMessages = [
+                'Query executed: db.campaigns.find({status: "active"}).limit(20) - ' + (Math.floor(Math.random() * 50) + 5) + 'ms',
+                'Index optimization: campaigns.category - Performance improved 15%',
+                'Backup completed: ' + new Date().toISOString().split('T')[0] + '_backup.gz - 2.1GB',
+                'Connection pool: ' + (Math.floor(Math.random() * 50) + 150) + ' active, ' + (Math.floor(Math.random() * 20) + 40) + ' idle',
+                'Aggregation pipeline: donation statistics - ' + (Math.floor(Math.random() * 100) + 20) + 'ms'
+            ];
+            
+            const message = dbMessages[Math.floor(Math.random() * dbMessages.length)];
+            const timestamp = new Date().toISOString().replace('T', ' ').substr(0, 19);
+            const logType = Math.random() > 0.8 ? 'warning' : 'info';
+            addLogEntry('dbLogs', timestamp, logType, message);
+        }
+
+        function updateSecurityLogs() {
+            const securityMessages = [
+                'User login: user' + Math.floor(Math.random() * 1000) + '@example.com - 2FA verified',
+                'Failed login attempt: Blocked IP 185.234.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
+                'SSL certificate check: All certificates valid',
+                'Firewall rule updated: Blocked suspicious traffic',
+                'Security scan: No vulnerabilities detected',
+                'API rate limit: Normal usage patterns detected'
+            ];
+            
+            const message = securityMessages[Math.floor(Math.random() * securityMessages.length)];
+            const timestamp = new Date().toISOString().replace('T', ' ').substr(0, 19);
+            const logType = message.includes('Failed') || message.includes('Blocked') ? 'warning' : 'success';
+            addLogEntry('securityLogs', timestamp, logType, message);
+        }
+
+        function addLogEntry(containerId, timestamp, level, message) {
+            const logsContainer = document.getElementById(containerId);
+            if (!logsContainer) return;
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span>
+                <span class="log-level ${level}">${level.toUpperCase()}</span>
+                <span class="log-message">${message}</span>
+            `;
+            
+            // Add to top and limit to 20 entries
+            logsContainer.insertBefore(logEntry, logsContainer.firstChild);
+            while (logsContainer.children.length > 20) {
+                logsContainer.removeChild(logsContainer.lastChild);
+            }
+        }
+
+        // API Functions
+        function showApiDetails(apiId) {
+            const apiDetails = {
+                'auth-login': {
+                    method: 'POST',
+                    path: '/api/v2/auth/login',
+                    description: 'Authenticate user and generate JWT token',
+                    parameters: ['email', 'password', 'remember_me'],
+                    response: 'JWT token and user profile'
+                },
+                'campaigns-list': {
+                    method: 'GET',
+                    path: '/api/v2/campaigns',
+                    description: 'Retrieve paginated campaigns with filtering',
+                    parameters: ['page', 'limit', 'category', 'status'],
+                    response: 'Array of campaign objects'
+                }
+            };
+            
+            const details = apiDetails[apiId] || { description: 'API endpoint details' };
+            showToast('🔌 API Details', `${details.method} ${details.path} - ${details.description}`, 'info');
+        }
+
+        // Utility Functions
+        function updateElement(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        function copyCode(codeBlockId) {
+            const codeBlock = document.getElementById(codeBlockId);
+            if (codeBlock) {
+                const code = codeBlock.querySelector('pre code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('📋 Code Copied', 'Code snippet copied to clipboard', 'success');
+                });
+            }
+        }
+
+        function copyApiCode() {
+            const apiCode = `POST /api/v2/campaigns
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "title": "Help Build Schools in Rural India",
+  "description": "Supporting education infrastructure development",
+  "category": "education",
+  "goal": 500000,
+  "duration": 90,
+  "location": "Rajasthan, India",
+  "images": ["campaign_1.jpg", "campaign_2.jpg"],
+  "beneficiary": {
+    "name": "Rural Education Foundation",
+    "contact": "contact@ref.org"
+  },
+  "tags": ["education", "children", "rural development"]
+}`;
+            
+            navigator.clipboard.writeText(apiCode).then(() => {
+                showToast('📋 API Code Copied', 'API request example copied to clipboard', 'success');
+            });
+        }
+
+        // Toast Notification System
+        function showToast(title, message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            toast.innerHTML = `
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Demo simulation functions
+        function simulateSystemActivity() {
+            const activities = [
+                { title: '🔌 API Request', message: 'High traffic detected - Auto-scaling initiated', type: 'info' },
+                { title: '💰 Payment Processed', message: 'Razorpay webhook: ₹15,000 donation received', type: 'success' },
+                { title: '🔒 Security Alert', message: 'Suspicious login blocked automatically', type: 'warning' },
+                { title: '📊 Analytics Update', message: 'Daily metrics aggregation completed', type: 'info' },
+                { title: '🗄️ Database Optimized', message: 'Query performance improved by 18%', type: 'success' }
+            ];
+            
+            const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+            showToast(randomActivity.title, randomActivity.message, randomActivity.type);
+        }
+
+        // Simulate activity every 20 seconds
+        setInterval(simulateSystemActivity, 20000);
+
+        // Initial welcome message
+        setTimeout(() => {
+            showToast('🛡️ Backend System Online', 'Day 12: Complete backend simulation with APIs, database, integrations, and monitoring', 'success');
+        }, 1000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('.admin-search input')?.focus();
+            }
+            
+            // ESC to close modals/notifications
+            if (e.key === 'Escape') {
+                const toasts = document.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                });
+            }
+        });
+
+        // Performance optimization - debounce updates
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Optimized metric updates
+        const debouncedMetricUpdate = debounce(updateMetrics, 1000);
+
+        // Connection status monitoring
+        function checkConnectionStatus() {
+            if (navigator.onLine) {
+                showToast('🌐 Connection Restored', 'Backend services are online', 'success');
+            } else {
+                showToast('⚠️ Connection Lost', 'Working in offline mode', 'warning');
+            }
+        }
+
+        // Monitor connection status
+        window.addEventListener('online', checkConnectionStatus);
+        window.addEventListener('offline', checkConnectionStatus);
+
+        // Cleanup function for page unload
+        window.addEventListener('beforeunload', function() {
+            // Clean up any active intervals or connections
+            console.log('🧹 Cleaning up backend monitoring...');
+        });
+    </script>
+</body>
+</html>('apiExample')">📋 Copy</button>
+                </div>
+                <pre><code>POST /api/v2/campaigns
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "title": "Help Build Schools in Rural India",
+  "description": "Supporting education infrastructure development",
+  "category": "education",
+  "goal": 500000,
+  "duration": 90,
+  "location": "Rajasthan, India",
+  "images": ["campaign_1.jpg", "campaign_2.jpg"],
+  "beneficiary": {
+    "name": "Rural Education Foundation",
+    "contact": "contact@ref.org"
+  },
+  "tags": ["education", "children", "rural development"]
+}
+
+// Response
+{
+  "success": true,
+  "data": {
+    "id": "64f8a1b2c3d4e5f6g7h8i9j0",
+    "title": "Help Build Schools in Rural India",
+    "status": "pending_approval",
+    "created_at": "2025-01-15T10:30:00Z",
+    "approval_expected_by": "2025-01-17T10:30:00Z"
+  },
+  "message": "Campaign created successfully and sent for review"
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Database Page -->
+        <div id="databasePage" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Database Management</h1>
+                <p class="page-subtitle">MongoDB simulation with advanced querying, indexing, and real-time synchronization</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon backend">📊</div>
+                        <div>
+                            <div class="card-title">Collections Overview</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Database collections with document counts, indexing status, and performance metrics.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">users</div>
+                            <div class="stat-label">24,847 docs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">campaigns</div>
+                            <div class="stat-label">3,456 docs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">donations</div>
+                            <div class="stat-label">89,234 docs</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">analytics</div>
+                            <div class="stat-label">456K docs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon integration">⚡</div>
+                        <div>
+                            <div class="card-title">Performance Metrics</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Real-time database performance monitoring with query optimization and caching efficiency.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">12ms</div>
+                            <div class="stat-label">Avg Query Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">97.3%</div>
+                            <div class="stat-label">Cache Hit Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Active Connections</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">2.4GB</div>
+                            <div class="stat-label">Memory Usage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">Database Schema - Campaign Collection</div>
+                    <button class="copy-btn" onclick="copyCode('dbSchema')">📋 Copy</button>
+                </div>
+                <pre><code>// campaigns collection schema
+{
+  _id: ObjectId,
+  title: String,
+  description: String,
+  category: String, // enum: ['medical', 'education', 'emergency', 'animal', 'environment', 'sports']
+  creator: {
+    user_id: ObjectId,
+    name: String,
+    email: String,
+    verified: Boolean
+  },
+  financial: {
+    goal: Number,
+    raised: Number,
+    currency: String, // default: 'INR'
+    fee_percentage: Number // default: 5
+  },
+  timeline: {
+    created_at: Date,
+    updated_at: Date,
+    deadline: Date,
+    duration_days: Number
+  },
+  status: String, // enum: ['draft', 'pending', 'active', 'completed', 'suspended']
+  media: {
+    images: [String],
+    videos: [String],
+    documents: [String]
+  },
+  location: {
+    country: String,
+    state: String,
+    city: String,
+    coordinates: [Number] // [longitude, latitude]
+  },
+  analytics: {
+    views: Number,
+    shares: Number,
+    donations_count: Number,
+    average_donation: Number,
+    donors: [ObjectId]
+  },
+  updates: [{
+    title: String,
+    content: String,
+    images: [String],
+    created_at: Date,
+    views: Number
+  }],
+  tags: [String],
+  approval: {
+    status: String, // enum: ['pending', 'approved', 'rejected']
+    reviewed_by: ObjectId,
+    reviewed_at: Date,
+    notes: String,
+    ai_score: Number // 0-100, AI risk assessment
+  }
+}
+
+// Indexes
+db.campaigns.createIndex({ "category": 1, "status": 1 })
+db.campaigns.createIndex({ "creator.user_id": 1 })
+db.campaigns.createIndex({ "timeline.created_at": -1 })
+db.campaigns.createIndex({ "location.coordinates": "2dsphere" })
+db.campaigns.createIndex({ "financial.goal": 1, "financial.raised": 1 })</code></pre>
+            </div>
+
+            <div class="monitor-panel">
+                <div class="monitor-header">
+                    <div class="monitor-title">🔍 Database Query Monitor</div>
+                </div>
+                <div class="monitor-logs" id="dbLogs">
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:23:47</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">Query executed: db.campaigns.find({status: "active"}).limit(20) - 8ms</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:23:45</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">Index created: campaigns.location.coordinates (2dsphere) - 145ms</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:23:42</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">Aggregation pipeline: donation statistics by category - 23ms</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:23:39</span>
+                        <span class="log-level warning">WARNING</span>
+                        <span class="log-message">Slow query detected: users collection scan - 156ms</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:23:36</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">Backup completed: campaigns_backup_20250115.gz - 2.1GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrations Page -->
+        <div id="integrationsPage" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Third-Party Integrations</h1>
+                <p class="page-subtitle">Seamless connections with payment gateways, communication services, and analytics platforms</p>
+            </div>
+
+            <div class="integration-grid">
+                <div class="integration-card">
+                    <div class="integration-logo">💳</div>
+                    <div class="integration-name">Razorpay</div>
+                    <div class="integration-description">Primary payment gateway for Indian market with UPI, cards, and net banking support</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">💰</div>
+                    <div class="integration-name">Stripe</div>
+                    <div class="integration-description">International payment processing with multi-currency support</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">💸</div>
+                    <div class="integration-name">PayPal</div>
+                    <div class="integration-description">Global payment solution for international donors</div>
+                    <div class="integration-status available">
+                        <div class="status-dot" style="background: var(--secondary-color);"></div>
+                        Available
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">📧</div>
+                    <div class="integration-name">SendGrid</div>
+                    <div class="integration-description">Email delivery service for transactional and marketing emails</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">📨</div>
+                    <div class="integration-name">Mailchimp</div>
+                    <div class="integration-description">Email marketing automation and donor engagement campaigns</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">📱</div>
+                    <div class="integration-name">Twilio</div>
+                    <div class="integration-description">SMS notifications and two-factor authentication</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">📊</div>
+                    <div class="integration-name">Google Analytics</div>
+                    <div class="integration-description">Web analytics and user behavior tracking</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">🔍</div>
+                    <div class="integration-name">Mixpanel</div>
+                    <div class="integration-description">Advanced product analytics and user journey tracking</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">💬</div>
+                    <div class="integration-name">Slack</div>
+                    <div class="integration-description">Team notifications and admin alerts</div>
+                    <div class="integration-status available">
+                        <div class="status-dot" style="background: var(--secondary-color);"></div>
+                        Available
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">🐦</div>
+                    <div class="integration-name">Twitter API</div>
+                    <div class="integration-description">Social media integration for campaign sharing</div>
+                    <div class="integration-status available">
+                        <div class="status-dot" style="background: var(--secondary-color);"></div>
+                        Available
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">📘</div>
+                    <div class="integration-name">Facebook Graph</div>
+                    <div class="integration-description">Facebook and Instagram campaign promotion</div>
+                    <div class="integration-status available">
+                        <div class="status-dot" style="background: var(--secondary-color);"></div>
+                        Available
+                    </div>
+                </div>
+
+                <div class="integration-card">
+                    <div class="integration-logo">☁️</div>
+                    <div class="integration-name">AWS S3</div>
+                    <div class="integration-description">Cloud storage for media files and backups</div>
+                    <div class="integration-status connected">
+                        <div class="status-dot"></div>
+                        Connected
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">Webhook Integration Example - Payment Success</div>
+                    <button class="copy-btn" onclick="copyCode('webhookExample')">📋 Copy</button>
+                </div>
+                <pre><code>// Webhook endpoint configuration
+POST /api/v2/webhooks/payment/success
+Content-Type: application/json
+X-Webhook-Signature: sha256=8b5b9a5c2f1e3d4c...
+
+// Razorpay webhook payload
+{
+  "event": "payment.captured",
+  "account_id": "acc_BFQ7uQEaa3PVgF",
+  "contains": ["payment"],
+  "payload": {
+    "payment": {
+      "entity": {
+        "id": "pay_FH4xocGGGGhGGhGG",
+        "amount": 50000,
+        "currency": "INR",
+        "status": "captured",
+        "order_id": "order_FH4xnsdGGGhGGhGG",
+        "method": "upi",
+        "captured": true,
+        "description": "Donation for Help Children Campaign",
+        "email": "donor@example.com",
+        "contact": "+919876543210",
+        "notes": {
+          "campaign_id": "64f8a1b2c3d4e5f6g7h8i9j0",
+          "donor_name": "Priya Sharma",
+          "anonymous": false
+        },
+        "created_at": 1642492800
+      }
+    }
+  }
+}
+
+// Internal processing
+async function processPaymentWebhook(payload) {
+  const payment = payload.payment.entity;
+  
+  // Verify webhook signature
+  const isValid = verifyWebhookSignature(payload);
+  if (!isValid) throw new Error('Invalid webhook signature');
+  
+  // Update campaign and create donation record
+  await updateCampaignAmount(payment.notes.campaign_id, payment.amount);
+  await createDonationRecord({
+    payment_id: payment.id,
+    campaign_id: payment.notes.campaign_id,
+    amount: payment.amount / 100, // Convert to rupees
+    donor_email: payment.email,
+    donor_name: payment.notes.donor_name,
+    payment_method: payment.method,
+    status: 'completed'
+  });
+  
+  // Send thank you email
+  await sendThankYouEmail(payment.email, payment.notes.campaign_id);
+  
+  // Trigger real-time updates
+  await broadcastDonationUpdate(payment.notes.campaign_id);
+}</code></pre>
+            </div>
+        </div>
+
+        <!-- Monitoring Page -->
+        <div id="monitoringPage" class="page">
+            <div class="page-header">
+                <h1 class="page-title">System Monitoring</h1>
+                <p class="page-subtitle">Real-time performance monitoring, error tracking, and system health dashboard</p>
+            </div>
+
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <div class="performance-value" id="monitorCpuUsage">23.7%</div>
+                    <div class="performance-label">CPU Usage</div>
+                    <div class="performance-trend">📈 Normal load</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="monitorMemoryUsage">4.2GB</div>
+                    <div class="performance-label">Memory Usage</div>
+                    <div class="performance-trend">💾 67% of 6GB</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="monitorDiskUsage">1.8TB</div>
+                    <div class="performance-label">Disk Usage</div>
+                    <div class="performance-trend">💿 45% of 4TB</div>
+                </div>
+                <div class="performance-card">
+                    <div class="performance-value" id="monitorNetworkIO">847MB/s</div>
+                    <div class="performance-label">Network I/O</div>
+                    <div class="performance-trend">🌐 High throughput</div>
+                </div>
+            </div>
+
+            <div class="monitor-panel">
+                <div class="monitor-header">
+                    <div class="monitor-title">📊 Real-Time System Logs</div>
+                </div>
+                <div class="monitor-logs" id="systemLogs">
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:23</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">API Request: POST /api/v2/donations - 127ms - 200 OK</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:21</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">Payment webhook processed: Razorpay payment_captured - ₹5,000</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:19</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">Cache hit: campaigns:active:page:1 - 2ms response</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:17</span>
+                        <span class="log-level warning">WARNING</span>
+                        <span class="log-message">Rate limit approached: User 64f8a1b2c3d4e5f6 - 85/100 requests</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:15</span>
+                        <span class="log-level success">SUCCESS</span>
+                        <span class="log-message">Email sent: Thank you for donation - donor@example.com</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:13</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">Background job: Daily analytics aggregation started</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:11</span>
+                        <span class="log-level error">ERROR</span>
+                        <span class="log-message">Failed login attempt: invalid@email.com - IP: 192.168.1.100</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-timestamp">2025-01-15 14:27:09</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">Database connection pool: 156 active, 44 idle connections</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon api">📈</div>
+                        <div>
+                            <div class="card-title">Performance Metrics</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Real-time application performance monitoring with response times, throughput, and error rates.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">127ms</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">847/s</div>
+                            <div class="stat-label">Throughput</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">0.02%</div>
+                            <div class="stat-label">Error Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">99.98%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon backend">🔍</div>
+                        <div>
+                            <div class="card-title">Error Tracking</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Advanced error monitoring and alerting system with automatic error categorization and resolution tracking.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Errors Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">Critical</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">9</div>
+                            <div class="stat-label">Resolved</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">2.1h</div>
+                            <div class="stat-label">MTTR</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Page -->
+        <div id="securityPage" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Security Dashboard</h1>
+                <p class="page-subtitle">Advanced security monitoring, threat detection, and compliance management</p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon backend">🛡️</div>
+                        <div>
+                            <div class="card-title">Security Score</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Overall security health score based on authentication, encryption, vulnerability scans, and compliance checks.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">96.7%</div>
+                            <div class="stat-label">Security Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Critical Issues</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">2</div>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">A+</div>
+                            <div class="stat-label">SSL Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon integration">🔐</div>
+                        <div>
+                            <div class="card-title">Authentication & Access</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        Multi-factor authentication, session management, and role-based access control with advanced user verification.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">89.3%</div>
+                            <div class="stat-label">MFA Enabled</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">Active Sessions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">Failed Attempts</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">15min</div>
+                            <div class="stat-label">Session Timeout</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon api">🔍</div>
+                        <div>
+                            <div class="card-title">Threat Detection</div>
+                        </div>
+                    </div>
+                    <div class="card-description">
+                        AI-powered threat detection system monitoring for suspicious activities, fraud attempts, and security breaches.
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">34</div>
+                            <div class="stat-label">Threats Blocked</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">IPs Blocked</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Data Breaches</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">Detection Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-title">Security Configuration - JWT & Encryption</div>
+                    <button class="copy-btn" onclick="copyCodeDetails('auth-login')">
+                    <div class="api-method post">POST</div>
+                    <div class="api-path">/api/v2/auth/login</div>
+                    <div class="api-description">User authentication and JWT token generation</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+                
+                <div class="api-endpoint" onclick="showApiDetails('auth-register')">
+                    <div class="api-method post">POST</div>
+                    <div class="api-path">/api/v2/auth/register</div>
+                    <div class="api-description">New user registration with email verification</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('campaigns-list')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/campaigns</div>
+                    <div class="api-description">Retrieve paginated list of campaigns with filtering</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('campaigns-create')">
+                    <div class="api-method post">POST</div>
+                    <div class="api-path">/api/v2/campaigns</div>
+                    <div class="api-description">Create new fundraising campaign</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('campaigns-detail')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/campaigns/{id}</div>
+                    <div class="api-description">Get detailed campaign information</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('campaigns-update')">
+                    <div class="api-method put">PUT</div>
+                    <div class="api-path">/api/v2/campaigns/{id}</div>
+                    <div class="api-description">Update existing campaign details</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('donations-create')">
+                    <div class="api-method post">POST</div>
+                    <div class="api-path">/api/v2/donations</div>
+                    <div class="api-description">Process new donation with payment integration</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('donations-list')">
+                    <div class="api-method get">GET</div>
+                    <div class="api-path">/api/v2/donations</div>
+                    <div class="api-description">Retrieve donation history with analytics</div>
+                    <div class="api-status">
+                        <div class="status-dot"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+
+                <div class="api-endpoint" onclick="showApiDetails('users-profile')">

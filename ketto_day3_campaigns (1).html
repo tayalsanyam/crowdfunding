@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto - Crowdfunding Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-hover);
+            padding: 1rem 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #c0392b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #2ecc71);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Page Sections */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Home Page Styles */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Campaigns Page */
+        .campaigns-page {
+            background: var(--light-color);
+            min-height: 100vh;
+        }
+
+        .campaigns-header {
+            background: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .campaigns-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .campaigns-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .search-filters {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .campaigns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .campaign-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .campaign-image {
+            height: 220px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            position: relative;
+        }
+
+        .campaign-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .campaign-content {
+            padding: 1.5rem;
+        }
+
+        .campaign-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--dark-color);
+            line-height: 1.3;
+        }
+
+        .campaign-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), #2ecc71);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .campaign-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--dark-color);
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
+
+        .campaign-footer {
+            padding: 1rem 1.5rem;
+            background: var(--light-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .campaign-creator {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .donate-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        /* Campaign Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .campaign-detail-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .campaign-detail-meta {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+
+        .campaign-detail-progress {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .donation-section {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .donation-amounts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .amount-btn {
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .amount-btn.selected,
+        .amount-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .custom-amount {
+            margin: 1rem 0;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Campaign Creation Modal */
+        .create-campaign-modal .modal-content {
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Dashboard Updates */
+        .dashboard {
+            background: var(--light-color);
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .campaigns-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .filter-tabs {
+                gap: 0.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .donation-amounts {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--error-color); }
+        .toast.info { background: var(--secondary-color); }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="container">
+            <a class="logo" onclick="showPage('home')">Ketto</a>
+            
+            <ul class="nav-links">
+                <li><a onclick="showPage('home')">Home</a></li>
+                <li><a onclick="showPage('campaigns')">Campaigns</a></li>
+                <li><a onclick="showPage('about')">How It Works</a></li>
+                <li><a onclick="showPage('about')">About</a></li>
+                <li><a onclick="showPage('contact')">Contact</a></li>
+            </ul>
+
+            <!-- Auth Buttons (shown when not logged in) -->
+            <div class="auth-buttons" id="authButtons">
+                <a href="#" class="btn btn-outline" onclick="openModal('loginModal')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="openModal('signupModal')">Sign Up</a>
+            </div>
+
+            <!-- User Menu (shown when logged in) -->
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-avatar" onclick="toggleUserMenu()" id="userAvatar">U</div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="#" class="dropdown-item" onclick="showPage('dashboard')">Dashboard</a>
+                    <a href="#" class="dropdown-item" onclick="openModal('createCampaignModal')">Create Campaign</a>
+                    <a href="#" class="dropdown-item" onclick="showMessage('Profile editing available in dashboard!')">Edit Profile</a>
+                    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--border-color);">
+                    <button class="dropdown-item" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <section class="hero">
+            <div class="container">
+                <h1>Fund Dreams,<br>Change Lives</h1>
+                <p>Join millions of people who are raising funds for personal, creative, and charitable causes across India</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary btn-large" onclick="openModal('createCampaignModal')">Start Fundraising</a>
+                    <a href="#" class="btn btn-secondary btn-large" onclick="showPage('campaigns')">Explore Campaigns</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section style="background: var(--light-color); padding: 80px 0;">
+            <div class="container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">₹50Cr+</h3>
+                        <p style="color: #666;">Total Raised</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;" id="totalCampaignsHome">25K+</h3>
+                        <p style="color: #666;">Campaigns</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">100K+</h3>
+                        <p style="color: #666;">Donors</p>
+                    </div>
+                    <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                        <h3 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;">85%</h3>
+                        <p style="color: #666;">Success Rate</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Campaigns Page -->
+    <div id="campaignsPage" class="page campaigns-page">
+        <div class="campaigns-header">
+            <div class="container">
+                <h1 class="campaigns-title">Discover Campaigns</h1>
+                <p class="campaigns-subtitle">Find and support causes that matter to you</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Search and Filters -->
+            <div class="search-filters">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="campaignSearch" placeholder="Search campaigns by title, description, or creator...">
+                    <button class="btn btn-primary" onclick="searchCampaigns()">Search</button>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-category="all" onclick="filterCampaigns('all')">All</button>
+                    <button class="filter-tab" data-category="medical" onclick="filterCampaigns('medical')">🏥 Medical</button>
+                    <button class="filter-tab" data-category="education" onclick="filterCampaigns('education')">🎓 Education</button>
+                    <button class="filter-tab" data-category="emergency" onclick="filterCampaigns('emergency')">🚨 Emergency</button>
+                    <button class="filter-tab" data-category="creative" onclick="filterCampaigns('creative')">🎨 Creative</button>
+                    <button class="filter-tab" data-category="social" onclick="filterCampaigns('social')">🤝 Social</button>
+                    <button class="filter-tab" data-category="sports" onclick="filterCampaigns('sports')">⚽ Sports</button>
+                </div>
+            </div>
+
+            <!-- Campaigns Grid -->
+            <div class="campaigns-grid" id="campaignsGrid">
+                <!-- Campaigns will be loaded here -->
+            </div>
+
+            <!-- Load More Button -->
+            <div style="text-align: center; margin: 2rem 0;">
+                <button class="btn btn-outline" onclick="loadMoreCampaigns()" id="loadMoreBtn">Load More Campaigns</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page dashboard">
+        <div class="dashboard-header">
+            <div class="container">
+                <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--dark-color); margin-bottom: 0.5rem;">Welcome back, <span id="dashboardUserName">User</span>!</h1>
+                <p style="color: #666; font-size: 1.2rem;">Manage your campaigns and track your impact</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openModal('createCampaignModal')">Create New Campaign</button>
+                <button class="btn btn-outline" onclick="showPage('campaigns')">Browse Campaigns</button>
+            </div>
+
+            <!-- User's Campaigns -->
+            <div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 2rem; color: var(--dark-color);">My Campaigns</h2>
+                <div id="userCampaignsGrid" class="campaigns-grid">
+                    <!-- User's campaigns will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Detail Modal -->
+    <div id="campaignModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="campaignModalImage">
+                <span class="close" onclick="closeModal('campaignModal')">&times;</span>
+                <div id="campaignModalIcon">🏥</div>
+            </div>
+            <div class="modal-body">
+                <h2 class="campaign-detail-title" id="campaignModalTitle">Campaign Title</h2>
+                <div class="campaign-detail-meta">
+                    <span>By <strong id="campaignModalCreator">Creator</strong></span>
+                    <span>•</span>
+                    <span id="campaignModalCategory">Category</span>
+                    <span>•</span>
+                    <span id="campaignModalDate">Date</span>
+                </div>
+                
+                <div class="campaign-detail-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="campaignModalProgress"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="campaignModalRaised">₹0</div>
+                            <div class="stat-label">Raised</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="campaignModalGoal">₹0</div>
+                            <div class="stat-label">Goal</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="campaignModalDonors">0</div>
+                            <div class="stat-label">Donors</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="campaignModalDays">0</div>
+                            <div class="stat-label">Days Left</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 2rem 0;">
+                    <h3 style="margin-bottom: 1rem; color: var(--dark-color);">About This Campaign</h3>
+                    <p id="campaignModalDescription" style="line-height: 1.6; color: #666;">Campaign description will appear here...</p>
+                </div>
+
+                <div class="donation-section">
+                    <h3 style="margin-bottom: 1rem; color: var(--dark-color);">Support This Campaign</h3>
+                    <div class="donation-amounts">
+                        <button class="amount-btn" onclick="selectAmount(500)">₹500</button>
+                        <button class="amount-btn" onclick="selectAmount(1000)">₹1,000</button>
+                        <button class="amount-btn" onclick="selectAmount(2500)">₹2,500</button>
+                        <button class="amount-btn" onclick="selectAmount(5000)">₹5,000</button>
+                        <button class="amount-btn" onclick="selectAmount(10000)">₹10,000</button>
+                        <button class="amount-btn" onclick="selectAmount(25000)">₹25,000</button>
+                    </div>
+                    <div class="custom-amount">
+                        <label for="customDonationAmount" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Or enter custom amount:</label>
+                        <input type="number" id="customDonationAmount" class="form-control" placeholder="Enter amount in ₹" min="10">
+                    </div>
+                    <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="proceedToDonate()">Donate Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Campaign Modal -->
+    <div id="createCampaignModal" class="modal create-campaign-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createCampaignModal')">&times;</span>
+            <div style="padding: 2rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Create Your Campaign</h2>
+                <form onsubmit="createCampaign(event)">
+                    <div class="form-group">
+                        <label for="campaignTitle">Campaign Title *</label>
+                        <input type="text" id="campaignTitle" class="form-control" placeholder="Enter a compelling title for your campaign" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="campaignCategory">Category *</label>
+                            <select id="campaignCategory" class="form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="medical">🏥 Medical</option>
+                                <option value="education">🎓 Education</option>
+                                <option value="emergency">🚨 Emergency</option>
+                                <option value="creative">🎨 Creative</option>
+                                <option value="social">🤝 Social Cause</option>
+                                <option value="sports">⚽ Sports</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaignGoal">Funding Goal (₹) *</label>
+                            <input type="number" id="campaignGoal" class="form-control" placeholder="50000" min="1000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="campaignDescription">Campaign Description *</label>
+                        <textarea id="campaignDescription" class="form-control" rows="5" placeholder="Tell your story. Explain why you need funding and how it will help..." required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="campaignDuration">Campaign Duration (Days)</label>
+                            <select id="campaignDuration" class="form-control">
+                                <option value="30">30 Days</option>
+                                <option value="60" selected>60 Days</option>
+                                <option value="90">90 Days</option>
+                                <option value="120">120 Days</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="campaignLocation">Location</label>
+                            <input type="text" id="campaignLocation" class="form-control" placeholder="City, State">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Campaign</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeModal('donationModal')">&times;</span>
+            <div style="padding: 2rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Complete Your Donation</h2>
+                
+                <div style="background: var(--light-color); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
+                    <h4 id="donationCampaignTitle" style="margin-bottom: 0.5rem;">Campaign Title</h4>
+                    <p style="color: #666; margin-bottom: 1rem;">Donation Amount: <strong id="donationAmount">₹0</strong></p>
+                </div>
+
+                <form onsubmit="completeDonation(event)">
+                    <div class="form-group">
+                        <label for="donorName">Your Name *</label>
+                        <input type="text" id="donorName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="donorEmail">Email Address *</label>
+                        <input type="email" id="donorEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="donorPhone">Phone Number</label>
+                        <input type="tel" id="donorPhone" class="form-control" placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="donationMessage">Message (Optional)</label>
+                        <textarea id="donationMessage" class="form-control" rows="3" placeholder="Leave a message of support..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="anonymousDonation" style="margin-right: 0.5rem;">
+                            Make this donation anonymous
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 1rem;">Complete Donation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <div style="padding: 2rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Welcome Back</h2>
+                <form onsubmit="login(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign In</button>
+                </form>
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <p>Don't have an account? <a href="#" style="color: var(--primary-color); text-decoration: none;" onclick="closeModal('loginModal'); openModal('signupModal');">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <div style="padding: 2rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--dark-color);">Join Ketto</h2>
+                <form onsubmit="signup(event)">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address</label>
+                        <input type="email" id="signupEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" class="form-control" placeholder="Create a strong password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPhone">Phone Number</label>
+                        <input type="tel" id="signupPhone" class="form-control" placeholder="Enter your phone number" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+                </form>
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <p>Already have an account? <a href="#" style="color: var(--primary-color); text-decoration: none;" onclick="closeModal('signupModal'); openModal('loginModal');">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        let currentUser = null;
+        let users = [
+            { 
+                id: 1, 
+                name: "Demo User", 
+                email: "demo@ketto.com", 
+                password: "demo123", 
+                phone: "+91 9876543210",
+                campaigns: [],
+                donations: []
+            }
+        ];
+
+        let campaigns = [
+            {
+                id: 1,
+                title: "Help Rahul Fight Cancer",
+                category: "medical",
+                description: "Supporting a young boy's battle against leukemia. Every contribution makes a difference in his recovery journey. The funds will be used for chemotherapy, medications, and hospital expenses.",
+                goal: 500000,
+                raised: 325000,
+                donors: 156,
+                daysLeft: 23,
+                creator: "Rahul's Family",
+                creatorId: 2,
+                status: "active",
+                createdDate: "2024-06-15",
+                location: "Mumbai, Maharashtra"
+            },
+            {
+                id: 2,
+                title: "Education for Rural Children",
+                category: "education",
+                description: "Building a school in a remote village to provide quality education to underprivileged children. This project will benefit over 200 children in the community.",
+                goal: 750000,
+                raised: 420000,
+                donors: 89,
+                daysLeft: 45,
+                creator: "NGO Shiksha",
+                creatorId: 3,
+                status: "active",
+                createdDate: "2024-05-20",
+                location: "Rajasthan"
+            },
+            {
+                id: 3,
+                title: "Flood Relief Kerala",
+                category: "emergency",
+                description: "Emergency relief for families affected by recent floods in Kerala. Providing food, shelter, and medical aid to displaced families.",
+                goal: 1000000,
+                raised: 890000,
+                donors: 245,
+                daysLeft: 12,
+                creator: "Kerala Relief Fund",
+                creatorId: 4,
+                status: "active",
+                createdDate: "2024-07-10",
+                location: "Kerala"
+            },
+            {
+                id: 4,
+                title: "Independent Film Project",
+                category: "creative",
+                description: "Supporting an independent filmmaker to create a documentary about environmental conservation in the Western Ghats.",
+                goal: 300000,
+                raised: 185000,
+                donors: 67,
+                daysLeft: 30,
+                creator: "Priya Sharma",
+                creatorId: 5,
+                status: "active",
+                createdDate: "2024-06-01",
+                location: "Bangalore, Karnataka"
+            },
+            {
+                id: 5,
+                title: "Clean Water Initiative",
+                category: "social",
+                description: "Installing water purification systems in 10 villages across rural India to provide clean drinking water to thousands of families.",
+                goal: 600000,
+                raised: 450000,
+                donors: 123,
+                daysLeft: 18,
+                creator: "Water for All NGO",
+                creatorId: 6,
+                status: "active",
+                createdDate: "2024-06-25",
+                location: "Uttar Pradesh"
+            },
+            {
+                id: 6,
+                title: "Support Young Athlete",
+                category: "sports",
+                description: "Help a talented young athlete participate in national championships and achieve their Olympic dreams. Funds will cover training, equipment, and travel expenses.",
+                goal: 200000,
+                raised: 150000,
+                donors: 78,
+                daysLeft: 25,
+                creator: "Sports Foundation",
+                creatorId: 7,
+                status: "active",
+                createdDate: "2024-06-30",
+                location: "Delhi"
+            }
+        ];
+
+        let donations = [];
+        let currentCampaign = null;
+        let selectedDonationAmount = 0;
+        let currentFilter = 'all';
+        let displayedCampaigns = 6;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            loadCampaigns();
+            initializeSearch();
+        });
+
+        // Page Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // Update page-specific content
+            if (pageId === 'campaigns') {
+                loadCampaigns();
+            } else if (pageId === 'dashboard') {
+                loadUserCampaigns();
+            }
+        }
+
+        // Campaign Management
+        function loadCampaigns() {
+            const grid = document.getElementById('campaignsGrid');
+            const filteredCampaigns = filterCampaignsByCategory(campaigns, currentFilter);
+            
+            grid.innerHTML = '';
+            
+            const campaignsToShow = filteredCampaigns.slice(0, displayedCampaigns);
+            
+            campaignsToShow.forEach(campaign => {
+                const campaignCard = createCampaignCard(campaign);
+                grid.appendChild(campaignCard);
+            });
+            
+            // Update load more button
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (filteredCampaigns.length <= displayedCampaigns) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+            
+            // Update total campaigns count
+            document.getElementById('totalCampaignsHome').textContent = campaigns.length + '+';
+        }
+
+        function createCampaignCard(campaign) {
+            const card = document.createElement('div');
+            card.className = 'campaign-card';
+            card.onclick = () => openCampaignModal(campaign);
+            
+            const progressPercentage = Math.min((campaign.raised / campaign.goal) * 100, 100);
+            const categoryIcons = {
+                'medical': '🏥',
+                'education': '🎓',
+                'emergency': '🚨',
+                'creative': '🎨',
+                'social': '🤝',
+                'sports': '⚽'
+            };
+            
+            card.innerHTML = `
+                <div class="campaign-image">
+                    <div class="campaign-badge">${campaign.category}</div>
+                    <div style="font-size: 4rem;">${categoryIcons[campaign.category]}</div>
+                </div>
+                <div class="campaign-content">
+                    <h3 class="campaign-title">${campaign.title}</h3>
+                    <p class="campaign-description">${campaign.description}</p>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressPercentage}%"></div>
+                        </div>
+                        <div class="campaign-stats">
+                            <div class="stat">
+                                <div class="stat-value">₹${formatNumber(campaign.raised)}</div>
+                                <div class="stat-label">Raised</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${campaign.donors}</div>
+                                <div class="stat-label">Donors</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${campaign.daysLeft}</div>
+                                <div class="stat-label">Days Left</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="campaign-footer">
+                    <span class="campaign-creator">By ${campaign.creator}</span>
+                    <button class="btn btn-success donate-btn" onclick="event.stopPropagation(); quickDonate(${campaign.id})">Donate</button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function filterCampaigns(category) {
+            currentFilter = category;
+            displayedCampaigns = 6;
+            
+            // Update active filter tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            loadCampaigns();
+        }
+
+        function filterCampaignsByCategory(campaignList, category) {
+            if (category === 'all') {
+                return campaignList;
+            }
+            return campaignList.filter(campaign => campaign.category === category);
+        }
+
+        function searchCampaigns() {
+            const searchTerm = document.getElementById('campaignSearch').value.toLowerCase();
+            const filteredCampaigns = campaigns.filter(campaign => 
+                campaign.title.toLowerCase().includes(searchTerm) ||
+                campaign.description.toLowerCase().includes(searchTerm) ||
+                campaign.creator.toLowerCase().includes(searchTerm)
+            );
+            
+            const grid = document.getElementById('campaignsGrid');
+            grid.innerHTML = '';
+            
+            if (filteredCampaigns.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                        <h3>No campaigns found</h3>
+                        <p>Try adjusting your search terms or browse by category</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredCampaigns.forEach(campaign => {
+                const campaignCard = createCampaignCard(campaign);
+                grid.appendChild(campaignCard);
+            });
+            
+            document.getElementById('loadMoreBtn').style.display = 'none';
+        }
+
+        function loadMoreCampaigns() {
+            displayedCampaigns += 6;
+            loadCampaigns();
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('campaignSearch');
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchCampaigns();
+                }
+            });
+        }
+
+        // Campaign Detail Modal
+        function openCampaignModal(campaign) {
+            currentCampaign = campaign;
+            
+            const categoryIcons = {
+                'medical': '🏥',
+                'education': '🎓',
+                'emergency': '🚨',
+                'creative': '🎨',
+                'social': '🤝',
+                'sports': '⚽'
+            };
+            
+            document.getElementById('campaignModalIcon').textContent = categoryIcons[campaign.category];
+            document.getElementById('campaignModalTitle').textContent = campaign.title;
+            document.getElementById('campaignModalCreator').textContent = campaign.creator;
+            document.getElementById('campaignModalCategory').textContent = campaign.category;
+            document.getElementById('campaignModalDate').textContent = formatDate(campaign.createdDate);
+            document.getElementById('campaignModalDescription').textContent = campaign.description;
+            
+            document.getElementById('campaignModalRaised').textContent = '₹' + formatNumber(campaign.raised);
+            document.getElementById('campaignModalGoal').textContent = '₹' + formatNumber(campaign.goal);
+            document.getElementById('campaignModalDonors').textContent = campaign.donors;
+            document.getElementById('campaignModalDays').textContent = campaign.daysLeft;
+            
+            const progressPercentage = Math.min((campaign.raised / campaign.goal) * 100, 100);
+            document.getElementById('campaignModalProgress').style.width = progressPercentage + '%';
+            
+            openModal('campaignModal');
+        }
+
+        // Donation System
+        function selectAmount(amount) {
+            selectedDonationAmount = amount;
+            
+            // Update UI
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            document.getElementById('customDonationAmount').value = '';
+        }
+
+        function proceedToDonate() {
+            if (!currentCampaign) return;
+            
+            const customAmount = document.getElementById('customDonationAmount').value;
+            const donationAmount = customAmount ? parseInt(customAmount) : selectedDonationAmount;
+            
+            if (!donationAmount || donationAmount < 10) {
+                showToast('Please select or enter a valid donation amount (minimum ₹10)', 'error');
+                return;
+            }
+            
+            selectedDonationAmount = donationAmount;
+            
+            // Pre-fill donation modal
+            document.getElementById('donationCampaignTitle').textContent = currentCampaign.title;
+            document.getElementById('donationAmount').textContent = '₹' + formatNumber(donationAmount);
+            
+            if (currentUser) {
+                document.getElementById('donorName').value = currentUser.name;
+                document.getElementById('donorEmail').value = currentUser.email;
+                document.getElementById('donorPhone').value = currentUser.phone || '';
+            }
+            
+            closeModal('campaignModal');
+            openModal('donationModal');
+        }
+
+        function quickDonate(campaignId) {
+            const campaign = campaigns.find(c => c.id === campaignId);
+            if (campaign) {
+                openCampaignModal(campaign);
+                // Scroll to donation section would happen here in a real app
+            }
+        }
+
+        function completeDonation(event) {
+            event.preventDefault();
+            
+            const donorName = document.getElementById('donorName').value.trim();
+            const donorEmail = document.getElementById('donorEmail').value.trim();
+            const donorPhone = document.getElementById('donorPhone').value.trim();
+            const message = document.getElementById('donationMessage').value.trim();
+            const isAnonymous = document.getElementById('anonymousDonation').checked;
+            
+            if (!donorName || !donorEmail) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Create donation record
+            const donation = {
+                id: donations.length + 1,
+                campaignId: currentCampaign.id,
+                campaignTitle: currentCampaign.title,
+                amount: selectedDonationAmount,
+                donorName: isAnonymous ? 'Anonymous' : donorName,
+                donorEmail: donorEmail,
+                donorPhone: donorPhone,
+                message: message,
+                isAnonymous: isAnonymous,
+                date: new Date().toISOString().split('T')[0],
+                status: 'completed'
+            };
+            
+            donations.push(donation);
+            
+            // Update campaign
+            currentCampaign.raised += selectedDonationAmount;
+            currentCampaign.donors += 1;
+            
+            // Update user's donations if logged in
+            if (currentUser) {
+                if (!currentUser.donations) currentUser.donations = [];
+                currentUser.donations.push(donation);
+                saveUserData();
+            }
+            
+            // Save data
+            localStorage.setItem('campaigns', JSON.stringify(campaigns));
+            localStorage.setItem('donations', JSON.stringify(donations));
+            
+            closeModal('donationModal');
+            showToast(`Thank you for your donation of ₹${formatNumber(selectedDonationAmount)}!`, 'success');
+            
+            // Refresh displays
+            loadCampaigns();
+            if (document.getElementById('userCampaignsGrid')) {
+                loadUserCampaigns();
+            }
+            
+            // Reset donation form
+            resetDonationForm();
+        }
+
+        function resetDonationForm() {
+            document.getElementById('donorName').value = '';
+            document.getElementById('donorEmail').value = '';
+            document.getElementById('donorPhone').value = '';
+            document.getElementById('donationMessage').value = '';
+            document.getElementById('anonymousDonation').checked = false;
+            selectedDonationAmount = 0;
+            
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('customDonationAmount').value = '';
+        }
+
+        // Campaign Creation
+        function createCampaign(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                showToast('Please log in to create a campaign', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('campaignTitle').value.trim();
+            const category = document.getElementById('campaignCategory').value;
+            const goal = parseInt(document.getElementById('campaignGoal').value);
+            const description = document.getElementById('campaignDescription').value.trim();
+            const duration = parseInt(document.getElementById('campaignDuration').value);
+            const location = document.getElementById('campaignLocation').value.trim();
+            
+            if (!title || !category || !goal || !description) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (goal < 1000) {
+                showToast('Minimum funding goal is ₹1,000', 'error');
+                return;
+            }
+            
+            // Create new campaign
+            const newCampaign = {
+                id: campaigns.length + 1,
+                title: title,
+                category: category,
+                description: description,
+                goal: goal,
+                raised: 0,
+                donors: 0,
+                daysLeft: duration,
+                creator: currentUser.name,
+                creatorId: currentUser.id,
+                status: 'active',
+                createdDate: new Date().toISOString().split('T')[0],
+                location: location || 'India'
+            };
+            
+            campaigns.push(newCampaign);
+            
+            // Update user's campaigns
+            if (!currentUser.campaigns) currentUser.campaigns = [];
+            currentUser.campaigns.push(newCampaign.id);
+            
+            // Save data
+            localStorage.setItem('campaigns', JSON.stringify(campaigns));
+            saveUserData();
+            
+            closeModal('createCampaignModal');
+            showToast('Campaign created successfully!', 'success');
+            
+            // Reset form
+            document.getElementById('campaignTitle').value = '';
+            document.getElementById('campaignCategory').value = '';
+            document.getElementById('campaignGoal').value = '';
+            document.getElementById('campaignDescription').value = '';
+            document.getElementById('campaignLocation').value = '';
+            
+            // Refresh displays
+            loadCampaigns();
+            if (document.getElementById('dashboardPage').classList.contains('active')) {
+                loadUserCampaigns();
+            }
+        }
+
+        // User Dashboard
+        function loadUserCampaigns() {
+            if (!currentUser) return;
+            
+            const grid = document.getElementById('userCampaignsGrid');
+            if (!grid) return;
+            
+            const userCampaigns = campaigns.filter(campaign => campaign.creatorId === currentUser.id);
+            
+            if (userCampaigns.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                        <h3>No campaigns yet</h3>
+                        <p>Create your first campaign to start fundraising</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" onclick="openModal('createCampaignModal')">Create Campaign</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = '';
+            userCampaigns.forEach(campaign => {
+                const campaignCard = createCampaignCard(campaign);
+                grid.appendChild(campaignCard);
+            });
+        }
+
+        // Authentication (Simplified from Day 2)
+        function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateAuthState();
+                closeModal('loginModal');
+                showToast('Welcome back, ' + user.name.split(' ')[0] + '!', 'success');
+            } else {
+                showToast('Invalid email or password', 'error');
+            }
+        }
+
+        function signup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const phone = document.getElementById('signupPhone').value.trim();
+            
+            if (users.find(u => u.email === email)) {
+                showToast('An account with this email already exists', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                password: password,
+                phone: phone,
+                campaigns: [],
+                donations: []
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            updateAuthState();
+            closeModal('signupModal');
+            showToast('Account created successfully! Welcome to Ketto, ' + name.split(' ')[0] + '!', 'success');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthState();
+            showPage('home');
+            showToast('You have been logged out successfully', 'info');
+        }
+
+        function checkAuthState() {
+            const savedUser = localStorage.getItem('currentUser');
+            const savedUsers = localStorage.getItem('users');
+            const savedCampaigns = localStorage.getItem('campaigns');
+            const savedDonations = localStorage.getItem('donations');
+            
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            }
+            
+            if (savedCampaigns) {
+                campaigns = JSON.parse(savedCampaigns);
+            }
+            
+            if (savedDonations) {
+                donations = JSON.parse(savedDonations);
+            }
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthState();
+            }
+        }
+
+        function updateAuthState() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userAvatar = document.getElementById('userAvatar');
+            const dashboardUserName = document.getElementById('dashboardUserName');
+            
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'block';
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+                if (dashboardUserName) {
+                    dashboardUserName.textContent = currentUser.name.split(' ')[0];
+                }
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        function saveUserData() {
+            if (currentUser) {
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex] = currentUser;
+                }
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('active');
+        }
+
+        // Utility Functions
+        function formatNumber(num) {
+            if (num >= 10000000) {
+                return (num / 10000000).toFixed(1) + 'Cr';
+            } else if (num >= 100000) {
+                return (num / 100000).toFixed(1) + 'L';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString('en-IN');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Click outside to close
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('dropdownMenu');
+            
+            if (!userMenu.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+            
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+
+        // Demo functions for testing
+        function addDemoData() {
+            if (currentUser && currentUser.campaigns.length === 0) {
+                // Create a demo campaign for the user
+                const demoCampaign = {
+                    id: campaigns.length + 1,
+                    title: "Help Me Complete My Education",
+                    category: "education",
+                    description: "I'm a final year engineering student facing financial difficulties. Your support will help me complete my studies and achieve my dreams.",
+                    goal: 75000,
+                    raised: 25000,
+                    donors: 12,
+                    daysLeft: 40,
+                    creator: currentUser.name,
+                    creatorId: currentUser.id,
+                    status: "active",
+                    createdDate: new Date().toISOString().split('T')[0],
+                    location: "Pune, Maharashtra"
+                };
+                
+                campaigns.push(demoCampaign);
+                currentUser.campaigns.push(demoCampaign.id);
+                
+                // Add a demo donation
+                const demoDonation = {
+                    id: donations.length + 1,
+                    campaignId: 1,
+                    campaignTitle: "Help Rahul Fight Cancer",
+                    amount: 5000,
+                    donorName: currentUser.name,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'completed'
+                };
+                
+                donations.push(demoDonation);
+                currentUser.donations.push(demoDonation);
+                
+                // Save data
+                localStorage.setItem('campaigns', JSON.stringify(campaigns));
+                localStorage.setItem('donations', JSON.stringify(donations));
+                saveUserData();
+                
+                loadCampaigns();
+                loadUserCampaigns();
+                showToast('Demo data added! Check your dashboard.', 'success');
+            }
+        }
+
+        // Keyboard shortcuts for testing
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                addDemoData();
+            }
+            if (e.key === 'Escape') {
+                // Close any open modals
+                const activeModals = document.querySelectorAll('.modal.active');
+                activeModals.forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+        });
+
+        // Initialize search on enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.target.id === 'campaignSearch' && e.key === 'Enter') {
+                searchCampaigns();
+            }
+        });
+
+        // Placeholder function for features coming later
+        function showMessage(message) {
+            showToast(message, 'info');
+        }
+
+        // Auto-update campaign days left (simulate real-time)
+        setInterval(function() {
+            campaigns.forEach(campaign => {
+                if (campaign.daysLeft > 0) {
+                    // In a real app, this would be calculated from end date
+                    // For demo, we'll just simulate some changes occasionally
+                }
+            });
+        }, 60000); // Check every minute
+
+        // Add some interactive enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling for better UX
+            const style = document.createElement('style');
+            style.textContent = `
+                html {
+                    scroll-behavior: smooth;
+                }
+                
+                .campaign-card {
+                    transform-origin: center;
+                }
+                
+                .campaign-card:hover .campaign-title {
+                    color: var(--primary-color);
+                }
+                
+                .filter-tab {
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .filter-tab::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                
+                .filter-tab:hover::before {
+                    left: 100%;
+                }
+                
+                @media (prefers-reduced-motion: reduce) {
+                    * {
+                        animation-duration: 0.01ms !important;
+                        animation-iteration-count: 1 !important;
+                        transition-duration: 0.01ms !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
+                

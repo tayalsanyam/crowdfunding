@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketto - Crowdfunding Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --shadow: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        .logo:hover::after {
+            width: 100%;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.8rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #c0392b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-btn span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-color);
+            margin: 2px 0;
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 180px 0 120px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .btn-large {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Statistics Section */
+        .stats {
+            background: var(--light-color);
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 0 100%);
+        }
+
+        .stats-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            counter-reset: stat-counter;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* Categories Preview */
+        .categories-preview {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .category-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+
+        .category-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+            position: relative;
+            z-index: 2;
+        }
+
+        .category-card p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Call to Action */
+        .cta {
+            background: linear-gradient(135deg, var(--dark-color) 0%, #34495e 100%);
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 20px 20px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .auth-buttons {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-large {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            .stat-item {
+                padding: 2rem 1.5rem;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero {
+                padding: 150px 0 80px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <nav class="container">
+            <a href="#" class="logo">Ketto</a>
+            
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#campaigns">Campaigns</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-outline" onclick="showMessage('Login feature coming in Day 2!')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showMessage('Signup feature coming in Day 2!')">Sign Up</a>
+            </div>
+
+            <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Fund Dreams,<br>Change Lives</h1>
+                <p class="subtitle">Join millions of people who are raising funds for personal, creative, and charitable causes across India</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary btn-large" onclick="showMessage('Campaign creation coming in Day 2!')">Start Fundraising</a>
+                    <a href="#campaigns" class="btn btn-secondary btn-large">Explore Campaigns</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats">
+        <div class="container stats-container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-number" data-count="5000000000">₹0</div>
+                    <div class="stat-label">Total Raised</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-number" data-count="250000">0</div>
+                    <div class="stat-label">Campaigns</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <div class="stat-number" data-count="1000000">0</div>
+                    <div class="stat-label">Donors</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">✅</span>
+                    <div class="stat-number" data-count="85">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Preview -->
+    <section class="categories-preview">
+        <div class="container">
+            <h2 class="section-title">Fundraising Categories</h2>
+            <p class="section-subtitle">Discover campaigns across various causes and make a difference in someone's life today</p>
+            
+            <div class="categories-grid">
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">🏥</span>
+                    <h3>Medical</h3>
+                    <p>Help families cover medical treatments, surgeries, and emergency healthcare expenses</p>
+                </div>
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">🎓</span>
+                    <h3>Education</h3>
+                    <p>Support students with scholarships, school fees, and educational resources</p>
+                </div>
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">🚨</span>
+                    <h3>Emergency</h3>
+                    <p>Provide immediate relief for natural disasters and crisis situations</p>
+                </div>
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">🎨</span>
+                    <h3>Creative</h3>
+                    <p>Fund innovative projects, artistic endeavors, and creative initiatives</p>
+                </div>
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">🤝</span>
+                    <h3>Social Cause</h3>
+                    <p>Support community development and social welfare projects</p>
+                </div>
+                <div class="category-card" onclick="showMessage('Category filtering coming in Day 3!')">
+                    <span class="category-icon">⚽</span>
+                    <h3>Sports</h3>
+                    <p>Help athletes achieve their dreams and promote sports in communities</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Make a Difference?</h2>
+            <p>Start your fundraising journey today or support a cause close to your heart</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary btn-large" onclick="showMessage('Campaign creation coming in Day 2!')">Start Your Campaign</a>
+                <a href="#" class="btn btn-outline btn-large" onclick="showMessage('Campaign browsing coming in Day 3!')">Browse Campaigns</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animated counter for statistics
+        function animateCounter(element, target, suffix = '') {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = formatNumber(target) + suffix;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = formatNumber(Math.floor(current)) + suffix;
+                }
+            }, 20);
+        }
+
+        function formatNumber(num) {
+            if (num >= 10000000) {
+                return '₹' + (num / 10000000).toFixed(0) + 'Cr';
+            } else if (num >= 100000) {
+                return (num / 100000).toFixed(0) + 'L+';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(0) + 'K+';
+            }
+            return num.toString();
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.classList.contains('stat-number')) {
+                        const target = parseInt(entry.target.dataset.count);
+                        const suffix = entry.target.textContent.includes('%') ? '%' : '';
+                        animateCounter(entry.target, target, suffix);
+                    }
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stats when they come into view
+            document.querySelectorAll('.stat-number').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Animate category cards
+            document.querySelectorAll('.category-card').forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                el.style.transition = 'all 0.6s ease';
+                el.style.transitionDelay = `${index * 0.1}s`;
+                observer.observe(el);
+            });
+
+            // Animate stat items
+            document.querySelectorAll('.stat-item').forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                el.style.transition = 'all 0.6s ease';
+                el.style.transitionDelay = `${index * 0.2}s`;
+                observer.observe(el);
+            });
+        });
+
+        // Placeholder function for features coming in later days
+        function showMessage(message) {
+            // Create a simple notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: var(--primary-color);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            // Add slide animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add some interactive hover effects
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.animation = 'pulse 0.6s ease';
+            });
+            
+            card.addEventListener('animationend', function() {
+                this.style.animation = '';
+            });
+        });
+
+        // Add floating animation to hero buttons
+        document.querySelectorAll('.hero-buttons .btn').forEach((btn, index) => {
+            btn.style.animation = `float 3s ease-in-out infinite ${index * 0.5}s`;
+        });
+
+        // Add float animation
+        const floatStyle = document.createElement('style');
+        floatStyle.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(floatStyle);
+    </script>
+</body>
+</html>
